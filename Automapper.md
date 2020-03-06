@@ -1,4 +1,5 @@
-# Ignore specific properties
+## Ignoring and customizing properties
+Ignore specific properties
  
 ```c#
 ForPath(i => i.PropertyName, i => i.Ignore());
