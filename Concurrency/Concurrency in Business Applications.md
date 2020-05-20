@@ -1,3 +1,4 @@
+*Kitap önerisi: Patterns of Enterprise Application Architecture Martin Fowler*
 
 ### Transaction
 
@@ -273,3 +274,91 @@ ALTER DATABASE TestData SET READ_COMMITTED_SNAPSHOT ON;
 sqllocaldb stop "MSSQLLocalDB" -k
 sqllocaldb start "MSSQLLocalDB" -k
 ```
+### Deadlock
+
+İki task'ın birbirini kalıcı olarak engellediğinde meydana gelir. Her bir taskın bir kaynak üzerinde bir lock'u vardır. Ancak database'ler bu durumda sadece bir transaction'ı seçecektir.
+
+> Örnek olması açısından bir kullanıcı bir sayfada bir işlem yaparken başka sayfada da işlem yapmak istiyor. Ancak işlem yapacağı sayfada da başkası o sayfayı lock'lamış olsun. Bu süreçte ilgili lock'un kalkmasını bekleyecektir. Ve burada ilgili sayfadaki lock'u oluşturan kullanıcı da ilk kullanıcının lock'ladığı sayfada işlem yapmaya çalışsın. Aynı şekilde her iki kullanıcı da birbirinin lock'unu beklemek durumundadur. Burada Database bir kurban seçecektir ya da lock süresi bitene göre bir kurban seçilir. Bu seçimler çok zor olduğun için başka farklı yöntemler mevcuttur.
+
+Deadlock'u engellemek için dbcontexten güncellenecek veri çekimi sırasında updlock komutu kullanılabilir. Bu sadece ilgili satır lock'lanmış olacaktır.
+
+```csharp
+return await _context.TestItems
+                .FromSql("SELECT Id, Name, Value, Modified, ModifiedBy FROM TESTITEMS WITH (UPDLOCK) WHERE Id = " + id)
+                .FirstAsync();
+```
+Bir ikinci metot ise deadlock olduğu zaman tekrarlı bir şekilde aynı transaction'ı çalıştırmak olabilir.
+```csharp
+            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=ConcurrencyTestingEFCoreDb;Trusted_Connection=True;MultipleActiveResultSets=true",
+                options => options.EnableRetryOnFailure());
+
+```
+
+```csharp
+using (var _context = new AppDataContext())
+            {
+                var strategy = _context.Database.CreateExecutionStrategy();
+
+                strategy.Execute(() =>
+                {
+
+                    using (var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.Serializable))
+                    {
+                        try
+                        {
+                            TestItem item = _context.TestItems.Find(testData.RecordId);
+                            int originalValue = item.Value;
+                            Console.WriteLine("{0} has read record {1}", testData.UserName, item.Id, item.Value);
+
+                            item.Value += 2;
+                            item.ModifiedBy = testData.UserName;
+                            item.Modified = DateTime.Now;
+
+                            Console.WriteLine("{0} is updating record {1}, setting Value:{2} + 2", testData.UserName, item.Id, originalValue);
+
+                            // now try to update the read lock to an exclusive lock
+                            _context.SaveChanges();
+
+                            Console.WriteLine("{0} about to Commit Transaction", testData.UserName);
+
+                            transaction.Commit();
+
+                            Console.WriteLine("{0} has Committed Transaction", testData.UserName);
+
+                        }
+                        catch (System.Data.SqlClient.SqlException ex)
+                        {
+                            Console.WriteLine("{0} Transaction failed. - Error Info: {1}", testData.UserName, GetExceptionMessage(ex));
+                            
+                            throw (ex);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("{0} Transaction failed. Error Info: {1}", testData.UserName, GetExceptionMessage(ex));
+
+                            throw (ex);
+                        }
+                    }
+                });
+            }
+```
+## Implementing the Optimistic Offline Lock Pattern
+Çakışmalar kaydetmeden önce tespit edilir ve bu pattern'e göre çakışma olasılığının düşük olduğu varsayılır.
+Çakışma olaylarının takibi için **Version** numarası tutulur. Bu bilgi kaydetme sırasında db dekiyle aynı olup olmadığı kontrol edilerek işleme devam edilir. Eğer farklı bir durum varsa kullanıcıya bilgi dönülür. Bu tür bilgileri elde etmek için update işleminde where sorgusu içerisinde versiyon numarası da eklenilir. Ya da where koşulu içerisine herhangi bir property'nin eski değeri de gönderilebilir.(Yani sadece adı değiştiğinde kullanıcı bu işlemi yapamasın gibi örnek verilebilir). Bu da yine iş kurallarına bağlıdır.
+
+EF Core tarafında tablo create ederken sütun olarak *rowversion* tipinde ekleme yapılabilir. Bu sütun auto-incrementing'dir ve 8 byte veri tutar.Sql tarafında timestamp olarak geçer. Entity tarafında da aşağıdaki gibi property tanımlanır.
+```csharp
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+```
+EF Core burada where sorguları içerisine otomatik olarak versiyon numarasını ekler. Eğer çakışma olduğunda DbConcurrencyException hatası fırlatır.
+Bunun yanında modelcreating kısmında da .IsRowVersion() metoduyla da ilgili property'nin timestamp olduğu belirtilmiş olunur.
+Ek olarak version numarası yerine ilgili alanın değişip değişmediği kontrolü yapılmak isteniyorsa aşağıdaki gibi **ConcurrencyCheck** attribute'u eklenilir.
+```csharp
+    [ConcurrencyCheck]
+    public string FirstName { get; set; }
+```
+
+
+
+
