@@ -930,10 +930,12 @@ Controller kısmında ise
 - **Shared Lock:** All objects reference the same lock
 
 ![ScreenShot](/Concurrency/Files/CearseGrained-SharedLock.png) 
+
 Shared lock ile kullanım örneği olarak: Bir kullanıcı task girişi yapsın ve taska ait birden fazla not eklesin. Burada not ekleme kısımlarında hiçbir işlem task (*yani ana kayıt*) eklenesiye kadar db'ye işlem yapılmacaktır. Burada cancel etme işlemini db yi yormadan yapmak ve optimistic kullanımda başka birisi aynı kaydı güncelleme işlemi gerçekleştirdiğinde çakışma durumunda hangi kayıtların ne şekilde güncellediğine dair bilgi kullanıcıya gösterme gibi işlemler yapılabilir.
 
 - **Root Lock:** Root object provides access and ownds lock
 ![ScreenShot](/Concurrency/Files/CearseGrained-RootLock.png) 
+
 Root lock kullanımında lazy loading kısmında dikkatli olmak gerekli. Çünkü bu aşamada veri değiştirilmiş olabilir.
 
 Coarse-grained lock patterni single lock kullanmaktan daha etkilidir ancak birkaç dezavantajı da vardır.
