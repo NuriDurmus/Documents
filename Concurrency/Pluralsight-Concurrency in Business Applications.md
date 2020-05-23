@@ -27,7 +27,7 @@ User1 işlem yaparken commitlenmeden User2 ilgili veriyi okur. Örnek olarak Use
 
 #### Nonrepeatable Read
 User1 bir veri setini alır ve User2 bundan sonra veriyi günceller. User1 ikinci defa veriyi okuduğunda güncellenmiş veriyi görecektir. Bu durum aynı transaction içerisinde veriyi iki defa okunmadığı durumda sorun olmayacaktır ancak transaction içerisinde veri iki defa okunuyorsa ilk okuma ile ikinci okuma arasında fark olacaktır.
-![ScreenShot](/Concurrenct/Files/NonrepeatableRead.png) 
+![ScreenShot](/Concurrency/Files/NonrepeatableRead.png) 
 
 #### Phantom Read
 Aynı nonrepeatable read gibidir ancak birden fazla veri seti için geçerlidir. User1 bir veri çeker ve o sırada User2 o veri seti için bir ekleme yapar User1 transaction içerisinde yeni bir sorgu daha çektiğinde User2 nin eklediği veriyi de almış olacaktır.  
@@ -46,13 +46,16 @@ En temel lock tipleri **read** ve **exclusive** locklar'dır.
 Bunlara ek olarak **Key Range** ve **Update Locks** da mevcuttur.
 
 Isolation level'ı lower ve higher olarak ikiye ayırabiliriz.
+
 **Lower Isolation Level:** Birden fazla kullanıcının aynı anda işlem yapmasına olanak tanır. Ancak bu da concurrency sorunlarını daha çok doğuracağı anlamına gelir.
+
 **Higher Isolation Level:** Concurrency sorunlarını azaltır. Ancak daha fazla sistem kaynağı tüketecektir. Transactionların başkalarını engelleme olasılığını arttırır hatta deadlock'a neden olabilir.
 
 ### Isolation Levels
 http://korayduzgun.blogspot.com/2012/05/sql-server-transaction-isolation-levels.html
 
-- Read Uncommitted
+- **Read Uncommitted**
+
     Bir veri üzerinde bir kullanıcı transaction yaparken diğer kullanıcılarında değişikliğe uğramış fakat commit edilmemiş verileri görebilmesini sağlayan level'dır. Dirty Read'e izin verir. 
 
 ```sql
@@ -77,7 +80,8 @@ COMMIT TRANSACTION;
 ```
 Bu durumda 2. transaction için hiç bekleme olmadan 100 değeri getirilmiş olacaktır. Ancak bu şekilde ilk transaction rollback olursa dirty read olmuş olacaktır.
 
-- Read Committed
+- **Read Committed**
+
     Dirty read'e izin vermez. Diğer transaction'ın tamamlanmasını bekler(yani commit edilmesini) 
 Yukarıdaki örnekte ikinci transaction için commited olarak ayarlansaydı 5 sn bekleme süresinden sonra okuma işlemi gerçekleşmiş olacaktı.
 ```sql
@@ -91,6 +95,7 @@ Ancak bu durumda nonrepeatable read'e neden olabilir. SQL server'ın default iso
 
 > Repeatable Read
     NonRepeatable Read'leri engeller. Mevcut transaction tamamlanasıya kadar update ya da delete olaylarını takip eder. Read lock'larını tutar ve deadlock'lara neden olabilir.
+
 **Transaction1**
 ```sql
 USE TestData;
@@ -125,7 +130,8 @@ Bu şekilde ikinci işlem block'lanmış oluyor ve ikinci transaction(update iş
 
 Range lock'lanmadığı için PhantomRead'e neden olabilir.
 
-- Serializable
+- **Serializable**
+
     Most isolated level. Tüm transaction'lar birbirinden tamamiyle ayrılmıştır.
     Range locks to prevent phantom reads.
 
@@ -165,8 +171,7 @@ Bu şekilde ilk olarak Transaction1 tamamlanır ve devamında Transaction2 çal�
 
 ### Sql Server Isolation Levels
 Sql Server'da bu isolation level'lara ek olarak 2 tane daha isolation level vardır.
-- Snapshot
-    Lock yerine satır versiyonlama kullanır. Bu değerler tempdb'den okunur. Bu durumda repeatable read söz konusu olabilir. Optimistic Concurrency için kullanılır.
+- **Snapshot:** Lock yerine satır versiyonlama kullanır. Bu değerler tempdb'den okunur. Bu durumda repeatable read söz konusu olabilir. Optimistic Concurrency için kullanılır.
 
 **Transaction1**
 ```sql
@@ -221,6 +226,7 @@ SELECT ID, TestValue  FROM TestItems WHERE Id=1;
 
 İkisinin aynı anda çalışması durumunda 2. transaction fail olacaktır(*Snapshot isolation transaction aborted due to update conflict*). Writing işlemi her zaman diğer writing işlemini engelleyecektir. Ancak read'ler write operasyonlarını ya da tam tersi olduğunda birbirini engellemeyecektir. 
 Repeatable read tarafındaki kodu tekrar inceleyecek olursak ilk transaction 2 defa read işlemi yapıyor ve bu surada ikinci transaction güncelleme işlemi yapıyor. İlk transaction eski veriyi güncellenmeden aynı şekilde getirecektir. Ancak burada ikinci transaction ilk transaction'ın tamamlanmasını bekleyecektir. Çünkü read lock vardır.
+
 **Transaction1**
 ```sql
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ; 
@@ -250,7 +256,7 @@ Query raporlama konusunda performans olarak Snapshot isolation level'ı önerile
     Isolation level değildir. Read Commited Isolation level'ın lock yerine  row versioning ile kullanılmasını sağlar. Bu işlem database ayarları konfigüre edilerek yapılır. Yine burada da row versioning için tempdb kullanılır. *Read işlemlerinde performans artışı için kullanılabilir.*
 
 
-> Mevcut isolation level'ı öğrenmek için aşağıdaki kod kullanılabilir
+Mevcut isolation level'ı öğrenmek için aşağıdaki kod kullanılabilir
 ```sql
 SELECT CASE transaction_isolation_level 
 WHEN 0 THEN 'Unspecified' 
@@ -919,14 +925,15 @@ Controller kısmında ise
         }
 ```
 
-### Implementing the Coarse-grained Lock Pattern
+### 5- Implementing the Coarse-grained Lock Pattern
 **Coarse Grained Lock Pattern:** Bir öğenin ilişkili olduğu nesneler varsa onları da lock'lama işlemidir.
-> Shared Lock: All objects reference the same lock
-![ScreenShot](/Concurrenct/Files/CearseGrained-SharedLock.png) 
+- **Shared Lock:** All objects reference the same lock
+
+![ScreenShot](/Concurrency/Files/CearseGrained-SharedLock.png) 
 Shared lock ile kullanım örneği olarak: Bir kullanıcı task girişi yapsın ve taska ait birden fazla not eklesin. Burada not ekleme kısımlarında hiçbir işlem task (*yani ana kayıt*) eklenesiye kadar db'ye işlem yapılmacaktır. Burada cancel etme işlemini db yi yormadan yapmak ve optimistic kullanımda başka birisi aynı kaydı güncelleme işlemi gerçekleştirdiğinde çakışma durumunda hangi kayıtların ne şekilde güncellediğine dair bilgi kullanıcıya gösterme gibi işlemler yapılabilir.
 
-> Root Lock: Root object provides access and ownds lock
-![ScreenShot](/Concurrenct/Files/CearseGrained-RootLock.png) 
+- **Root Lock:** Root object provides access and ownds lock
+![ScreenShot](/Concurrency/Files/CearseGrained-RootLock.png) 
 Root lock kullanımında lazy loading kısmında dikkatli olmak gerekli. Çünkü bu aşamada veri değiştirilmiş olabilir.
 
 Coarse-grained lock patterni single lock kullanmaktan daha etkilidir ancak birkaç dezavantajı da vardır.
@@ -1248,12 +1255,10 @@ ViewModel tarafına aşağıdaki eklemer yapılır
 View tarafında kullanmak için
 ```html
 <script type="text/javascript">
-
     function SetTaskAction(id, modified) {
         document.getElementById('taskId').value = id;
         document.getElementById('taskModifiedTime').value = modified;
     }
-
 </script>
     <input asp-for="ChangeRequest.ID" type="hidden" />
     <input asp-for="TaskId" id="taskId" type="hidden" />
@@ -1352,11 +1357,12 @@ Coarse-grained lock patterni hem optimistic hem pessimistic olarak kullanılabil
 
 ### 6-Implementing the Implicist Lock Pattern
 Locklamanın developer'lar tarafından değil uygulama tarafından olması gerektiğini söyler. Diğer türlü developer tarafından lock'lama gibi işlemler unutulabilir. Bu da tutarlılığı düşürür. 
-> Ensure no gaps in use of locking strategy
-> Framework
-  > Base Classes
-  > Plumbing code
-  > Code generation
+- Ensure no gaps in use of locking strategy
+- Framework
+  - Base Classes
+  - Plumbing code
+  - Code generation
+
 Buada bir önceki işlemlere ek olarak Repository katmanı generic hale getirlir ve ilişkiler de dinamik olarak kontrol edilir.
 ```csharp
     public class GenericRepository<TEntity> : IGenericRepository<TEntity>
