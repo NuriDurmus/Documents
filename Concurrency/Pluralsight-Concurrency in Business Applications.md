@@ -27,14 +27,14 @@ User1 işlem yaparken commitlenmeden User2 ilgili veriyi okur. Örnek olarak Use
 
 #### Nonrepeatable Read
 User1 bir veri setini alır ve User2 bundan sonra veriyi günceller. User1 ikinci defa veriyi okuduğunda güncellenmiş veriyi görecektir. Bu durum aynı transaction içerisinde veriyi iki defa okunmadığı durumda sorun olmayacaktır ancak transaction içerisinde veri iki defa okunuyorsa ilk okuma ile ikinci okuma arasında fark olacaktır.
-![ScreenShot](/Concurrenct/files/NonrepeatableRead.png) 
+![ScreenShot](/Concurrenct/Files/NonrepeatableRead.png) 
 
 #### Phantom Read
 Aynı nonrepeatable read gibidir ancak birden fazla veri seti için geçerlidir. User1 bir veri çeker ve o sırada User2 o veri seti için bir ekleme yapar User1 transaction içerisinde yeni bir sorgu daha çektiğinde User2 nin eklediği veriyi de almış olacaktır.  
 
 #### Missing or Double Reads
 User1 büyük bir veri seti çeksin. Bu süreç içerisinde User2 veri setinde güncelleme yapmış olabilir ve burada index'te bir değişiklik yapmış olabilir. Bu durumda yeni indexte daha önceden okumuş olduğu veriyi tekrar okuma yapabilir. Ya da tam tersi okuma işleminin devamında olması gereken veri yer değiştirdiği için kayıp olabilir.
-![ScreenShot](/Concurrency/files/MissingOrDoubleReads.gif) 
+![ScreenShot](/Concurrency/Files/MissingOrDoubleReads.gif) 
 
 Bu tür durumlar locking data ile ya da row versioning ile çözülebilir. 
 
@@ -443,7 +443,7 @@ try
             }
             return View(model);
 ```
-![ScreenShot](/Concurrency/files/OptimisticLockSample.png) 
+![ScreenShot](/Concurrency/Files/OptimisticLockSample.png) 
 
 Entity'nin ilgişkili olduğu nesneler için değişikliklerin kontrolünün yapılmaması için aşağıdaki gibi TrackGraph metodu kullanılabilir.
 ```csharp
@@ -922,11 +922,11 @@ Controller kısmında ise
 ### Implementing the Coarse-grained Lock Pattern
 **Coarse Grained Lock Pattern:** Bir öğenin ilişkili olduğu nesneler varsa onları da lock'lama işlemidir.
 > Shared Lock: All objects reference the same lock
-![ScreenShot](/Concurrenct/files/CearseGrained-SharedLock.png) 
+![ScreenShot](/Concurrenct/Files/CearseGrained-SharedLock.png) 
 Shared lock ile kullanım örneği olarak: Bir kullanıcı task girişi yapsın ve taska ait birden fazla not eklesin. Burada not ekleme kısımlarında hiçbir işlem task (*yani ana kayıt*) eklenesiye kadar db'ye işlem yapılmacaktır. Burada cancel etme işlemini db yi yormadan yapmak ve optimistic kullanımda başka birisi aynı kaydı güncelleme işlemi gerçekleştirdiğinde çakışma durumunda hangi kayıtların ne şekilde güncellediğine dair bilgi kullanıcıya gösterme gibi işlemler yapılabilir.
 
 > Root Lock: Root object provides access and ownds lock
-![ScreenShot](/Concurrenct/files/CearseGrained-RootLock.png) 
+![ScreenShot](/Concurrenct/Files/CearseGrained-RootLock.png) 
 Root lock kullanımında lazy loading kısmında dikkatli olmak gerekli. Çünkü bu aşamada veri değiştirilmiş olabilir.
 
 Coarse-grained lock patterni single lock kullanmaktan daha etkilidir ancak birkaç dezavantajı da vardır.
