@@ -82,7 +82,7 @@ Bu durumda 2. transaction için hiç bekleme olmadan 100 değeri getirilmiş ola
 
 - **Read Committed**
 
-    Dirty read'e izin vermez. Diğer transaction'ın tamamlanmasını bekler(yani commit edilmesini) 
+    Dirty read'e izin vermez. Diğer transaction'ın tamamlanmasını bekler (yani commit edilmesini). 
 Yukarıdaki örnekte ikinci transaction için commited olarak ayarlansaydı 5 sn bekleme süresinden sonra okuma işlemi gerçekleşmiş olacaktı.
 ```sql
 USE TestData; 
@@ -91,10 +91,9 @@ BEGIN TRANSACTION;
 SELECT ID, TestValue  FROM TestItems WHERE Id=1;
 COMMIT TRANSACTION;
 ```
-Ancak bu durumda nonrepeatable read'e neden olabilir. SQL server'ın default isolation level'ıdır.
+- **Nonrepeatable read** Ancak bu durumda *Nonrepeatable read*'e neden olabilir. SQL server'ın default isolation level'ıdır.
 
-> Repeatable Read
-    NonRepeatable Read'leri engeller. Mevcut transaction tamamlanasıya kadar update ya da delete olaylarını takip eder. Read lock'larını tutar ve deadlock'lara neden olabilir.
+**Repeatable Read:** NonRepeatable Read'leri engeller. Mevcut transaction tamamlanasıya kadar update ya da delete olaylarını takip eder. Read lock'larını tutar ve deadlock'lara neden olabilir.
 
 **Transaction1**
 ```sql
@@ -171,7 +170,7 @@ Bu şekilde ilk olarak Transaction1 tamamlanır ve devamında Transaction2 çal�
 
 ### Sql Server Isolation Levels
 Sql Server'da bu isolation level'lara ek olarak 2 tane daha isolation level vardır.
-- **Snapshot:** Lock yerine satır versiyonlama kullanır. Bu değerler tempdb'den okunur. Bu durumda repeatable read söz konusu olabilir. Optimistic Concurrency için kullanılır.
+- **Snapshot:** Lock yerine satır versiyonlama kullanır. Bu değerler tempdb'den okunur. Sql Server güncelleme ya da silme işlemi sırasında copy-on-write mekanizmasını kullanır. Bu durumda repeatable read söz konusu olabilir. Optimistic Concurrency için kullanılır.
 
 **Transaction1**
 ```sql
@@ -197,7 +196,7 @@ SELECT ID, TestValue  FROM TestItems WHERE Id=1;
 
 Yukarıdaki iki transaction çalıştığında transction için önce eski değer devamında transaction tamamlandığı için Transaction2'nin güncellediği değer olan 450 değeri gelecektir. Transaction2 ise transaction1'in tamamlanmasnı bekleyip 450 değerini verecektir.
 Ancak burada aşağıdaki gibi snapshot işlemi yapılsaydı. 
-Bunun içn ilk önce snapshot özelliğini o database için aktif etmemiz gerekmektedir.
+Bunun için ilk önce snapshot özelliğini o database için aktif etmemiz gerekmektedir.
 ```sql
 ALTER DATABASE TestData SET ALLOW_SNAPSHOT_ISOLATION ON  
 ```
@@ -225,7 +224,7 @@ SELECT ID, TestValue  FROM TestItems WHERE Id=1;
 ```
 
 İkisinin aynı anda çalışması durumunda 2. transaction fail olacaktır(*Snapshot isolation transaction aborted due to update conflict*). Writing işlemi her zaman diğer writing işlemini engelleyecektir. Ancak read'ler write operasyonlarını ya da tam tersi olduğunda birbirini engellemeyecektir. 
-Repeatable read tarafındaki kodu tekrar inceleyecek olursak ilk transaction 2 defa read işlemi yapıyor ve bu surada ikinci transaction güncelleme işlemi yapıyor. İlk transaction eski veriyi güncellenmeden aynı şekilde getirecektir. Ancak burada ikinci transaction ilk transaction'ın tamamlanmasını bekleyecektir. Çünkü read lock vardır.
+Repeatable read tarafındaki kodu tekrar inceleyecek olursak ilk transaction 2 defa read işlemi yapıyor ve bu sırada ikinci transaction güncelleme işlemi yapıyor. İlk transaction eski veriyi güncellenmeden aynı şekilde getirecektir. Ancak burada ikinci transaction ilk transaction'ın tamamlanmasını bekleyecektir. Çünkü read lock vardır.
 
 **Transaction1**
 ```sql
@@ -252,11 +251,11 @@ SET TRANSACTION ISOLATION LEVEL SNAPSHOT;
 İlk transaction eski değerleri yine aynı şeklde getirecektir ancak ikinci transaction lock olmadığı için 5 sn beklemeden direk güncelleme işlemini yapacaktır.
 Query raporlama konusunda performans olarak Snapshot isolation level'ı önerilebilir.
 
-- Read Committed Snapshot
-    Isolation level değildir. Read Commited Isolation level'ın lock yerine  row versioning ile kullanılmasını sağlar. Bu işlem database ayarları konfigüre edilerek yapılır. Yine burada da row versioning için tempdb kullanılır. *Read işlemlerinde performans artışı için kullanılabilir.*
+- **Read Committed Snapshot (RCSI):**
+    Isolation level değildir. Read Commited Isolation level'ın lock yerine  **row versioning** ile kullanılmasını sağlar. Bu işlem database ayarları konfigüre edilerek yapılır. Yine burada da row versioning için tempdb kullanılır. *Read işlemlerinde performans artışı için kullanılabilir.*
 
 
-Mevcut isolation level'ı öğrenmek için aşağıdaki kod kullanılabilir
+Mevcut isolation level'ı öğrenmek için aşağıdaki kod kullanılabilir.
 ```sql
 SELECT CASE transaction_isolation_level 
 WHEN 0 THEN 'Unspecified' 
@@ -277,10 +276,55 @@ Burada ikinci selectten dönen yanıt 0 olduğunda bu isolation level'ın pasif 
 ```sql
 ALTER DATABASE TestData SET READ_COMMITTED_SNAPSHOT ON;
 ```
-``` 
+``` sql
 sqllocaldb stop "MSSQLLocalDB" -k
 sqllocaldb start "MSSQLLocalDB" -k
 ```
+
+Aktif snapshot transaction'ları görüntülemek için
+```sql
+SELECT DB_NAME(database_id) AS DatabaseName, t.*
+FROM sys.dm_tran_active_snapshot_database_transactions t
+    JOIN sys.dm_exec_sessions s
+    ON t.session_id = s.session_id;
+```
+TempDb nin dolma olasılığına karşılık doluluk miktarını gösteren kod
+```sql
+SELECT DB_NAME(vsu.database_id) AS DatabaseName,
+    vsu.reserved_page_count, 
+    vsu.reserved_space_kb, 
+    tu.total_page_count as tempdb_pages, 
+    vsu.reserved_page_count * 100. / tu.total_page_count AS [Snapshot %],
+    tu.allocated_extent_page_count * 100. / tu.total_page_count AS [tempdb % used]
+FROM sys.dm_tran_version_store_space_usage vsu
+    CROSS JOIN tempdb.sys.dm_db_file_space_usage tu
+WHERE vsu.database_id = DB_ID(DB_NAME());
+```
+Mevcut version storedaki bileşenleri gösterir
+```sql
+-- Show the contents of the current version store (expensive)
+SELECT DB_NAME(database_id) AS DatabaseName, *
+FROM sys.dm_tran_version_store;
+```
+
+```sql
+-- Show objects producing most versions (expensive)
+SELECT DB_NAME(database_id) AS DatabaseName, *
+FROM sys.dm_tran_top_version_generators;
+```
+
+#### Locking vs. Row Versioning
+| Locking(Pessimistic)             | Row Versioning (Optimistic)           |
+|----------------------------------|---------------------------------------|
+| Read Uncommited                  | Read commited snapshot isolation      |
+| Read Commited                    | Snapshot isolation level              |
+| Repeatable read                  |                                       |
+| Serializable                     |                                       |
+| ANSI SQL-92 compliant            | Proprietary                           |
+| Better for long-running updates  | Better for read-heavy operations      |
+| Normal tempdb usage              | Extra usage of tempdb (version store) |
+| More blocking = less concurrency | Less blocking = greater concurrency   |
+
 ### Deadlock
 
 İki task'ın birbirini kalıcı olarak engellediğinde meydana gelir. Her bir taskın bir kaynak üzerinde bir lock'u vardır. Ancak database'ler bu durumda sadece bir transaction'ı seçecektir.
@@ -349,6 +393,7 @@ using (var _context = new AppDataContext())
                 });
             }
 ```
+
 ## Implementing the Optimistic Offline Lock Pattern
 Çakışmalar kaydetmeden önce tespit edilir ve bu pattern'e göre çakışma olasılığının düşük olduğu varsayılır.
 Çakışma olaylarının takibi için **Version** numarası tutulur. Bu bilgi kaydetme sırasında db dekiyle aynı olup olmadığı kontrol edilerek işleme devam edilir. Eğer farklı bir durum varsa kullanıcıya bilgi dönülür. Bu tür bilgileri elde etmek için update işleminde where sorgusu içerisinde versiyon numarası da eklenilir. Ya da where koşulu içerisine herhangi bir property'nin eski değeri de gönderilebilir.(Yani sadece adı değiştiğinde kullanıcı bu işlemi yapamasın gibi örnek verilebilir). Bu da yine iş kurallarına bağlıdır.
@@ -504,7 +549,8 @@ Aynı şekilde silme işlemi için de entity tarafında update lock yapılamadı
 
         }
 ```
-### Implementing the Pessimistic Offline Lock Pattern
+
+## Implementing the Pessimistic Offline Lock Pattern
 Conflictlerin çok olduğu durumlarda, roll back maliyeti de artmış olacaktır. Bu durumda pessimistic pattern kullanılabilir. Kullanımı için öncelikle lock tipi belirlenir, lock manager ve protokoller tanımlanır.
 3 çeşit lock vardır
 **Exclusive Write lock**: *Writes block writers.* Bir kullanıcı bir kaydı düzenlediğinde başka bir kullanıcı onu düzenleyemez. Read işlemleriyle ilgilenmez.
@@ -513,13 +559,13 @@ Conflictlerin çok olduğu durumlarda, roll back maliyeti de artmış olacaktır
 
 **Exclusive Read/Write lock**: *Writers block readers. Readers block writers. Multiple readers ok.*
 
-#### Lock Manager
+### Lock Manager
 İlgili lock'u onaylar veya reddeder. Neyin lock'lanacağına (*primary key olabilir*) ve lock'un sahibinin kim olduğuna karar verir(*business transaction, session id, user id olabilir*). İmplementasyonu kod taradında olabilir(*store etmek için session memory ya da hashtable kullanılabilir*). Ancak kod tarafında store etmek için de load balancer kullanımı gibi senaryoda işler kompleksleşebilir. Bunun yanında implementasyon için **database table** kullanılabilir.
 - Lock table: Maps locks to owners. Serialized access
 - Exclusive Read and exclusive Write: Unique constraint on object id
 - Read/Write Lock: Multiple read locks. Potential for inconsistent reads
 
-#### Locking Protocol
+### Locking Protocol
 Locklama ve lock'u bırakma olaylarıyla ilgilenir.
 - Acquire lock before loading data. 
 - Lock and load in system transaction.
