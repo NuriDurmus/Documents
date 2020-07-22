@@ -6,14 +6,18 @@
 Tek bir iş birimi gibi çalışan operasyonlar dizisidir. Bu şekilde bir hata olması durumunda database'in stabil olmasını sağlar ve veriyi kurtarmayı sağlar. Bununla birlikte eşzamanlı erişim durumlarında işlemler arasındaki izolasyonu sağlar.  
 #### ACID properties of Transactions
 
-Atomicity: All or nothing
-Consistency: Data Integrity when complete. Transaction sonunda veritabanındaki bir durumun bir sonraki geçerli duruma geçmesini garanti altına alır. Database'e yazılan herhangi bir verinin belirlenen kurallara göre geçerli olmalıdır. Bu kurallar constraint,cascade,trigger'lar olabilir.
-Isolation: Modifications isolated from other transactions. Bir transaction tamamlanasıya kadar diğer transaction tarafından görülmemelidir.
-Durability: Effects are permanent. Sistem çöktüğünde ya da restart edildiğinde data hala saklanmış olmalıdır.
+**Atomicity:** All or nothing
+
+**Consistency:** Data Integrity when complete. Transaction sonunda veritabanındaki bir durumun bir sonraki geçerli duruma geçmesini garanti altına alır. Database'e yazılan herhangi bir verinin belirlenen kurallara göre geçerli olmalıdır. Bu kurallar constraint,cascade,trigger'lar olabilir.
+
+**Isolation:** Modifications isolated from other transactions. Bir transaction tamamlanasıya kadar diğer transaction tarafından görülmemelidir.
+
+**Durability:** Effects are permanent. Sistem çöktüğünde ya da restart edildiğinde data hala saklanmış olmalıdır.
 
 ### Concurrency Control
 #### Optimistic 
 Birçok transaction'ın genellikle bir diğerini etkilemediğini varsayar. Bunun için veri okumada lock olmaz. Sadece veri kayıt olduğunda çakışmaları kontrol eder.
+
 Kaydetme sırasında veri okunduktan sonra sistem başka bir transaction tarafından verinin değişip değişmediğini kontrol eder. Bunu da genelde verinin versiyon numarası ile custom oluşturulan fieldlar ile kontrol eder. Bu durumda da bir conflict olduğunda da transaction roll back edilir. Optimistic concurrency control genellikle veri çakışmalarının az olduğu durumlarda kullanılır. Burada roll back yapmanın maliyeti veriyi lock'lamaktan daha azdır.
 
 #### Pessimistic
@@ -41,8 +45,10 @@ Bu tür durumlar locking data ile ya da row versioning ile çözülebilir.
 ### Database Isolation Levels
 Veritabanında transaction işlemi gerçekleştirdiğinizde bu transaction belirli bir isolation level altında çalışır. Isolation level bir transaction'ın başka bir transction tarafından hangi düzeyde yalıtılacağını tanımlar. Isolation level verinin okundığında lock'lanıp lock'lanmayacağını, hanti tip lock'un talep edildiğini kontrol eder. Ayrıca Lock'un ne kadar tutulacağını da kontrol eder ve read etmeye çalışıldığında bu veri başka bir transaction tarafından değiştirildiğinde nasıl davranacağına karar verir. 
 En temel lock tipleri **read** ve **exclusive** locklar'dır. 
-> Read locklar SQL server tarafından share edilirler. Yani birden fazla transaction veriyi okuyabilir.  Bu tip lock read işlemi sonrasında relase edilebilir ya da transaction sonuna kadar saklanabilir. 
-> Exclusive locklar silinme ve güncellenme olasılığna karşın kullanılır. Bu tip lock için sadece bir transaction çalışır. Bu şekilde diğer lock'lar buradaki veriye erişemeyecektir. Ancak bu deadlocklar için önemli bir husustur. 
+- **Read lock**lar SQL server tarafından share edilirler. Yani birden fazla transaction veriyi okuyabilir.  Bu tip lock read işlemi sonrasında relase edilebilir ya da transaction sonuna kadar saklanabilir. 
+
+- **Exclusive lock**lar silinme ve güncellenme olasılığna karşın kullanılır. Bu tip lock için sadece bir transaction çalışır. Bu şekilde diğer lock'lar buradaki veriye erişemeyecektir. Ancak bu deadlocklar için önemli bir husustur. 
+
 Bunlara ek olarak **Key Range** ve **Update Locks** da mevcuttur.
 
 Isolation level'ı lower ve higher olarak ikiye ayırabiliriz.
