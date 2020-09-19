@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "DataDlow/1.0.0": {
+        "dependencies": {
+          "System.Threading.Tasks.Dataflow": "4.11.1"
+        },
+        "runtime": {
+          "DataDlow.dll": {}
+        }
+      },
+      "System.Threading.Tasks.Dataflow/4.11.1": {
+        "runtime": {
+          "lib/netstandard2.0/System.Threading.Tasks.Dataflow.dll": {
+            "assemblyVersion": "4.6.5.0",
+            "fileVersion": "4.700.20.21406"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DataDlow/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.Threading.Tasks.Dataflow/4.11.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-umDBSKTQMoYAbts6w49N33ctAjHhcfJkcva8xoDog01st35N+Ly/w+TB2vUcghxSw5vUYkpaCl/PI7tVw3R0Jw==",
+      "path": "system.threading.tasks.dataflow/4.11.1",
+      "hashPath": "system.threading.tasks.dataflow.4.11.1.nupkg.sha512"
+    }
+  }
+}

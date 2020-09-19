@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "WLxcw2KlmqUIbletgqEWhwt/Pk9EBH+4eaNFPuLaQvKKclhfWROD+Vmz2yWZLsH4EbyBaC+LPKDxCBb7DHrz6g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\09370837\\source\\repos\\NuriDurmus\\Documents\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow\\DataDlow.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\09370837\\.nuget\\packages\\system.threading.tasks.dataflow\\4.11.1\\system.threading.tasks.dataflow.4.11.1.nupkg.sha512"
+  ],
+  "logs": []
+}
