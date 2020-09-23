@@ -52,6 +52,9 @@ for (int i = 0; i < 10; i++)
 }
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 Input count:1
 Input count:1
@@ -85,7 +88,7 @@ output count:1
 Result:9  Output count:0 input count:0 list item: 8
 Tamamlandý
 ```
-
+</details>
 
 ### BatchBlock
 Verileri grup halinde almak için kullanýlýr.
@@ -191,6 +194,8 @@ private IEnumerable<string> FindEvenNumbers(int number)
     }
 }
 ```
+<details>
+<summary>Result</summary> 
 
 ```
 Tamamlandý.
@@ -220,6 +225,7 @@ Alýnan mesaj:9:4
 Alýnan mesaj:9:6
 Alýnan mesaj:9:8
 ```
+</details>
 
 Yine ayný þekilde multithread kullanmak için aþaðýdaki kod kullanýlabilir.
 ```csharp
@@ -273,6 +279,9 @@ for (int i = 0; i < 10; i++)
 }
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 Mesaj 0 a1 tarafýndan iþlenildi.
 Mesaj 1 a1 tarafýndan iþlenildi.
@@ -285,6 +294,7 @@ Mesaj 7 a1 tarafýndan iþlenildi.
 Mesaj 8 a1 tarafýndan iþlenildi.
 Mesaj 9 a1 tarafýndan iþlenildi.
 ```
+</details>
 
 Burada dikkat edileceði üzere default ayarlar deðiþtirilmediði için her zaman ilk alýcý çalýþtýrýlacaktýr. Bunun için consumer'lar üzerinden BoundedCapacity bilgisi set edilir.
 
@@ -303,6 +313,9 @@ var a2 = new ActionBlock<int>(a =>
 }, new ExecutionDataflowBlockOptions() { BoundedCapacity = 1 });
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 Mesaj 1 a2 tarafýndan iþlenildi.
 Mesaj 0 a1 tarafýndan iþlenildi.
@@ -315,6 +328,7 @@ Mesaj 7 a1 tarafýndan iþlenildi.
 Mesaj 8 a2 tarafýndan iþlenildi.
 Mesaj 9 a1 tarafýndan iþlenildi.
 ```
+</details>
 
 Burada a1 e 10 deðerin vermiþ olsaydýk hepsini a1 den iþletmiþ olacaktý. Çünkü gönderilen mesaj kapasitesi ve alacaðý mesaj kapasitesi ayný. Ýlk baþta sürekli a1'e düþmesinin nedeni ise default deðerin -1 yani iþlemsel olarak sonsuz mesajý alabiliyor olmasý anlamýna geliyordu. Bu yüzden hiçbir zaman a2'ye düþmeyecekti.
 
@@ -355,6 +369,8 @@ for (int i = 0; i < 10; i++)
 }
 ```
 
+<details>
+<summary>Result</summary> 
 
 ```
 Tamamlandý
@@ -379,6 +395,8 @@ Mesaj 8 a1 tarafýndan iþlenildi.
 10 mesajý kabul edildi.
 Mesaj 9 a2 tarafýndan iþlenildi.
 ```
+</details>
+
 
 ### BroadcastBlock
 Mesajý birden fazla alýcýya gönderir. Burada mesajdan kasýt class instance'larýdýr. Gönderilen mesaj birden fazla alýcýya ulaþtýðýnda her bir mesaj ayný instance'ý paylaþýr.
@@ -419,6 +437,9 @@ for (int i = 0; i < 10; i++)
 ```
 Burada tüm mesajlarýn baþarýlý bir þekilde kabul edildi ancak sadece ikisi iþlenildir.
 
+<details>
+<summary>Result</summary> 
+
 ```
 1 mesajý kabul edildi.
 Tamamlandý
@@ -436,6 +457,7 @@ Mesaj 0 a2 tarafýndan iþlenildi.
 Mesaj 9 a1 tarafýndan iþlenildi.
 Mesaj 9 a2 tarafýndan iþlenildi.
 ```
+</details>
 
 Bir mesaj bir yerden reject aldýðýnda tekrar gönderim yapýlmaz. Eðer boundedcapacity deðerleri kaldýrýlýrsa iþleyiþ de deðiþecektir.
 
@@ -455,6 +477,9 @@ var a2 = new ActionBlock<int>(a =>
     Task.Delay(300).Wait();
 });
 ```
+<details>
+<summary>Result</summary> 
+
 ```
 10 mesajý kabul edildi.
 Tamamlandý
@@ -488,6 +513,8 @@ Mesaj 8 a2 tarafýndan iþlenildi.
 Mesaj 9 a1 tarafýndan iþlenildi.
 Mesaj 9 a2 tarafýndan iþlenildi.
 ```
+</details>
+
 ### JoinBlock
 
 JoinBlock birden fazla blocklarý birleþtirerek baþka block'a aktarýmý mümkün kýlar.
@@ -535,6 +562,10 @@ for (int i = 0; i < 10; i++)
     });
 }
 ```
+
+<details>
+<summary>Result</summary> 
+
 ```
 Tamamlandý
 4 mesajý kabul edildi.
@@ -578,6 +609,8 @@ Mesaj 9 a1 tarafýndan iþlenilmekte.
 Mesaj 9 a2 tarafýndan iþlenilmekte.
 (9, 9) mesajý print block tarafýndan iþlenildi.
 ```
+</details>
+
 Multithread ve çalýþma sürelerinde biraz oynama yaparsak çalýþma sýrasý yine deðiþmeyecektir.
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a);
@@ -632,6 +665,9 @@ for (int i = 0; i < 10; i++)
 
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 6 mesajý kabul edildi.
 Tamamlandý
@@ -675,6 +711,8 @@ Mesaj 9 a1 tarafýndan iþlenilmekte.
 (-8, 8) mesajý print block tarafýndan iþlenildi. Deðerler toplamý her zaman 0 dönecektir: 0
 (-9, 9) mesajý print block tarafýndan iþlenildi. Deðerler toplamý her zaman 0 dönecektir: 0
 ```
+</details>
+
 ### BatchedJoinBlock
 JoingBlock gibi çalýþýr ama BatchedBlock gibi birden fazla öðeyi toplu halde alarak iþlem yapar. Ancak burada sýralama her çalýþmada farklý çalýþacaktýr.
 ```csharp
@@ -729,6 +767,9 @@ for (int i = 0; i < 10; i++)
 }
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 2 mesajý kabul edildi.
 4 mesajý kabul edildi.
@@ -768,6 +809,7 @@ Mesaj: [-3,-4] , [9]
 Mesaj 9 a1 tarafýndan iþlenilmekte.
 Mesaj: [-5,-6,-7] , []
 ```
+</details>
 
 ### WriteOnceBlock
 Adýndan da anlaþýlacaðý gibi tek bir mesajý kabul eder ve diðerlerini reddeder ve ayný yanýtý döner.
@@ -797,6 +839,8 @@ for (int i = 0; i < 15; i++)
     }
 }
 ```
+<details>
+<summary>Result</summary> 
 
 ```
 Mesaj 0 kabul edildi
@@ -826,6 +870,7 @@ Mesaj 0 kabul edildi. Iteration 13
 Mesaj 0 kabul edildi. Iteration 14
 Tamamlandý
 ```
+</details>
 
 Eðer receive metodu yerine baþka bir block'a gönderim yapacak olsaydýk sadece tek bir sefer çalýþtýðýný görebiliriz.
 ```csharp
@@ -845,6 +890,9 @@ for (int i = 0; i < 10; i++)
 block.LinkTo(print);
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 Mesaj 0 kabul edildi
 Mesaj 1 reddedildi
@@ -859,7 +907,7 @@ Mesaj 9 reddedildi
 Tamamlandý
 Mesaj 0 kabul edildi.
 ```
-
+</details>
 
 ### Completion
 BroadcastBlock örneðindeki sendasync metodunu aþaðýdaki gibi deðiþtirelim. Bu durumda Console.ReadLine kodunu kaldýrdýðýmýzda ilgili mesaj bilgileri ekrana yazýlmayacaktýr. Bunun nedeni ilgili kod bloðunun farklý thread'de çalýþmasýdýr ve ReadLine ile bir bekleme yaptýðýmýz için sonuçlarý görüntüleyebiliyorduk ancak bu kodu kaldýrdýðýmýzda kodu bekleten bir þey olmadýðý için sonuç ekrana yansýmadan Main metodu tamamlanmýþ olacaktýr. Bunu çözmek için ilgili thread'de çalýþan kodun tamamlanmasýný beklememiz gerekmektedir.
@@ -982,6 +1030,9 @@ for (int i = 0; i < 10; i++)
 }
 ```
 
+<details>
+<summary>Result</summary> 
+
 ```
 Tamamlandý
 Mesaj 0 a1 tarafýndan iþlenildi.
@@ -995,12 +1046,16 @@ Mesaj 7 a1 tarafýndan iþlenildi.
 Mesaj 8 a1 tarafýndan iþlenildi.
 Mesaj 9 a1 tarafýndan iþlenildi.
 ```
+</details>
+
 
 Append false yapýlýrsa a1 den önce a2 iliþkisi baðlanacaktýr. Bu þekilde sonuçlarýn hepsi a2 tarafýndan çalýþtýrýlacaktýr.
 
 ```csharp
 bufferBlock.LinkTo(a2,new DataflowLinkOptions() { Append = false });
 ```
+<details>
+<summary>Result</summary> 
 
 ```
 Tamamlandý
@@ -1015,6 +1070,8 @@ Mesaj 7 a2 tarafýndan iþlenildi.
 Mesaj 8 a2 tarafýndan iþlenildi.
 Mesaj 9 a2 tarafýndan iþlenildi.
 ```
+</details>
+
 ### MaxMessages
 Block tarafýndan alýnacak mesajlarý sýnýrlamak için kullanýlýr. Aþaðýdaki örnekte a2 için maksimum 5 mesaj alýnýr.
 
@@ -1027,7 +1084,7 @@ bufferBlock.LinkTo(a2, new DataflowLinkOptions()
 ```
 
 <details>
-<summary>Sonuç</summary> 
+<summary>Result</summary> 
 
 ```
 Tamamlandý
@@ -1133,6 +1190,10 @@ for (int i = 0; i < 10; i++)
     producer2.Post($"Producer 2 mesajý: {i}");
 }
 ```
+
+<details>
+<summary>Result</summary> 
+
 ```
 Tamamlandý
 Producer 1 mesajý: 0
@@ -1156,6 +1217,9 @@ Producer 2 mesajý: 7
 Producer 2 mesajý: 8
 Producer 2 mesajý: 9
 ```
+
+</details>
+
 Kod içerisine completion metotlarýný ekleyelim. Burada completion için oluþturduðumuz extension metot ile PropagateCompletion deðerini güncellediðimizi de unutmayalým.
 
 ```csharp
@@ -1173,6 +1237,10 @@ producer2.Complete();
 printBlock.Completion.Wait();
 ```
 Sonuç ne yazýkki istediðimiz gibi olmadý. Bazý mesajlar eksik kaldý. Bunun nedeni producer1 in tamamlandý komutunu göndermesiyle consumer'ýn da tamamlanmasý. Burada süreç tek yönlü olduðu için consumer producer2 ye tamamlanýp tamamlanmadýðýný sormadýðýndan tamamlandý olarak kabul edip yoluna devam etmekte.
+
+<details>
+<summary>Result</summary> 
+
 ```
 Producer 1 mesajý: 0
 Producer 1 mesajý: 1
@@ -1191,6 +1259,8 @@ Producer 2 mesajý: 4
 Producer 1 mesajý: 9
 Tamamlandý
 ```
+</details>
+
 TPL Dataflow'u bir push mimarisidir. Producer consumer'ý bilir ancak tersi mümkün deðildir. Bu yüzden PropagateCompletion deðeri default olarak false'dur. Buradaki senaryo için TPL tarafýnda hazýr bir çözüm olmasa da Task.WhenAll ile her iki completion'ýn bittiði aný bulabilir ve printBlock'un da complete eventi ile süreci tamamlamýþ oluruz. Burada LinkTo kýsmý eski haline getirilmiþ yani propagation'lar kaldýrýlmýþtýr. 
 
 ```csharp
@@ -1206,6 +1276,10 @@ for (int i = 0; i < 10; i++)
 await Task.WhenAll(new[] { producer1.Completion, producer2.Completion }).ContinueWith(a=>printBlock.Complete());
 printBlock.Completion.Wait();
 ```
+
+<details>
+<summary>Result</summary> 
+
 ```
 Tamamlandý
 Producer 1 mesajý: 0
@@ -1230,34 +1304,161 @@ Producer 2 mesajý: 8
 Producer 2 mesajý: 9
 ```
 
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
 ```csharp
 
 ```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
+```csharp
+
+```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
+
+```csharp
+
+```
+
+<details>
+<summary>Result</summary> 
+
+```
+
+```
+
+</details>
 
