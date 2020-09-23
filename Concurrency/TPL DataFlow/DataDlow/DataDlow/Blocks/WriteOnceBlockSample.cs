@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks.Dataflow;
 
-namespace DataDlow
+namespace DataDlow.Blocks
 {
     public class WriteOnceBlockSample
     {

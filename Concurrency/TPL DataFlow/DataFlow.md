@@ -1,3 +1,11 @@
+### Kaynak
+https://www.dotnetcurry.com/patterns-practices/1412/dataflow-pattern-csharp-dotnet
+https://www.blinkingcaret.com/2019/05/15/tpl-dataflow-in-net-core-in-depth-part-1/
+https://csharppedia.com/en/tutorial/3110/task-parallel-library--tpl--dataflow-constructs
+
+#### Ek kaynak
+https://michaelscodingspot.com/pipeline-pattern-implementations-csharp/
+
 ### ActionBlock
 Action gibi çalýþýr ve bunlarý bir veri seti halinde tutar. Geri dönüþ parametresi yoktur. Ýçerisindeki fonksiyonu asenkron olarak çalýþtýrýr.
 ```csharp
@@ -852,8 +860,404 @@ Tamamlandý
 Mesaj 0 kabul edildi.
 ```
 
+
+### Completion
+BroadcastBlock örneðindeki sendasync metodunu aþaðýdaki gibi deðiþtirelim. Bu durumda Console.ReadLine kodunu kaldýrdýðýmýzda ilgili mesaj bilgileri ekrana yazýlmayacaktýr. Bunun nedeni ilgili kod bloðunun farklý thread'de çalýþmasýdýr ve ReadLine ile bir bekleme yaptýðýmýz için sonuçlarý görüntüleyebiliyorduk ancak bu kodu kaldýrdýðýmýzda kodu bekleten bir þey olmadýðý için sonuç ekrana yansýmadan Main metodu tamamlanmýþ olacaktýr. Bunu çözmek için ilgili thread'de çalýþan kodun tamamlanmasýný beklememiz gerekmektedir.
+```csharp
+var broadcastBlock = new BroadcastBlock<int>(a => a);
+
+var a1 = new ActionBlock<int>(a =>
+{
+    Console.WriteLine($"Mesaj {a} a1 tarafýndan iþlenildi.");
+    Task.Delay(300).Wait();
+});
+
+
+var a2 = new ActionBlock<int>(a =>
+{
+    Console.WriteLine($"Mesaj {a} a2 tarafýndan iþlenildi.");
+    Task.Delay(300).Wait();
+});
+
+broadcastBlock.LinkTo(a1);
+broadcastBlock.LinkTo(a2);
+
+for (int i = 0; i < 10; i++)
+{
+    await broadcastBlock.SendAsync(i);
+}
+Console.WriteLine("Tamamlandý");
+//Console.ReadLine();
+```
+
+
+```
+Tamamlandý
+
+C:\Users\Nuri\...\TPL DataFlow\DataDlow\DataDlow\bin\Debug\netcoreapp3.1\DataDlow.exe (process 18700) exited with code 0.
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . .
+
+```
+
+Block'un süreçlerinin tamamlanýp tamamlanmadýðýný öðrenmek için block içerisinde mesajýn olup olmadýðýna ya da completed eventi kontrol edilir. Bunun için linkto içerisinde **PropagateCompletion** true olarak set edilmeli ve *broadcastBlock.Complete(); finalBlock.Completion.Wait();* metotlarý çaðýrýlmalýdýr.
+```csharp
+public static class LinktoWithPropagationExtension
+{
+    public static IDisposable LinkToWithPropagation<T>(this ISourceBlock<T> source,ITargetBlock<T> target)
+    {
+        return source.LinkTo(target, new DataflowLinkOptions()
+        {
+            PropagateCompletion = true
+        });
+    }
+}
+
+
+
+var broadcastBlock = new BroadcastBlock<int>(a => a);
+
+var a1 = new TransformBlock<int, int>(a =>
+{
+    Console.WriteLine($"Mesaj {a} a1 tarafýndan iþlenildi.");
+    Task.Delay(300).Wait();
+    return -a;
+});
+
+
+var a2 = new TransformBlock<int, int>(a =>
+{
+    Console.WriteLine($"Mesaj {a} a2 tarafýndan iþlenildi.");
+    Task.Delay(300).Wait();
+    return a;
+});
+
+
+var joinBlock = new JoinBlock<int, int>();
+a1.LinkToWithPropagation(joinBlock.Target1);
+a2.LinkToWithPropagation(joinBlock.Target2);
+
+broadcastBlock.LinkToWithPropagation(a1);
+broadcastBlock.LinkToWithPropagation(a2);
+
+var finalBlock = new ActionBlock<Tuple<int, int>>(a =>
+    {
+        Console.WriteLine($"{a.Item1}: tüm consumer'lar tarafýndan iþlenildi");
+    });
+
+joinBlock.LinkToWithPropagation(finalBlock);
+
+for (int i = 0; i < 10; i++)
+{
+    await broadcastBlock.SendAsync(i);
+}
+
+broadcastBlock.Complete();
+finalBlock.Completion.Wait();
+
+```
+### Append
+Append baðlanan consumer iliþkisini önceliklendirmek ya da kaldýrmak için kullanýlýr. Aþaðýdaki bufferblock için görüleceði üzere sadece a1 mesajlarý gelmektedir.
+
+```csharp
+var bufferBlock = new BufferBlock<int>();
+
+var a1 = new ActionBlock<int>(a =>
+{
+    Console.WriteLine($"Mesaj {a} a1 tarafýndan iþlenildi.");
+});
+
+
+var a2 = new ActionBlock<int>(a =>
+{
+    Console.WriteLine($"Mesaj {a} a2 tarafýndan iþlenildi.");
+});
+
+bufferBlock.LinkTo(a1);
+bufferBlock.LinkTo(a2);
+
+for (int i = 0; i < 10; i++)
+{
+    await bufferBlock.SendAsync(i);
+}
+```
+
+```
+Tamamlandý
+Mesaj 0 a1 tarafýndan iþlenildi.
+Mesaj 1 a1 tarafýndan iþlenildi.
+Mesaj 2 a1 tarafýndan iþlenildi.
+Mesaj 3 a1 tarafýndan iþlenildi.
+Mesaj 4 a1 tarafýndan iþlenildi.
+Mesaj 5 a1 tarafýndan iþlenildi.
+Mesaj 6 a1 tarafýndan iþlenildi.
+Mesaj 7 a1 tarafýndan iþlenildi.
+Mesaj 8 a1 tarafýndan iþlenildi.
+Mesaj 9 a1 tarafýndan iþlenildi.
+```
+
+Append false yapýlýrsa a1 den önce a2 iliþkisi baðlanacaktýr. Bu þekilde sonuçlarýn hepsi a2 tarafýndan çalýþtýrýlacaktýr.
+
+```csharp
+bufferBlock.LinkTo(a2,new DataflowLinkOptions() { Append = false });
+```
+
+```
+Tamamlandý
+Mesaj 0 a2 tarafýndan iþlenildi.
+Mesaj 1 a2 tarafýndan iþlenildi.
+Mesaj 2 a2 tarafýndan iþlenildi.
+Mesaj 3 a2 tarafýndan iþlenildi.
+Mesaj 4 a2 tarafýndan iþlenildi.
+Mesaj 5 a2 tarafýndan iþlenildi.
+Mesaj 6 a2 tarafýndan iþlenildi.
+Mesaj 7 a2 tarafýndan iþlenildi.
+Mesaj 8 a2 tarafýndan iþlenildi.
+Mesaj 9 a2 tarafýndan iþlenildi.
+```
+### MaxMessages
+Block tarafýndan alýnacak mesajlarý sýnýrlamak için kullanýlýr. Aþaðýdaki örnekte a2 için maksimum 5 mesaj alýnýr.
+
+```csharp
+bufferBlock.LinkTo(a2, new DataflowLinkOptions()
+{
+    Append = false,
+    MaxMessages = 5
+});
+```
+
+<details>
+<summary>Sonuç</summary> 
+
+```
+Tamamlandý
+Mesaj 5 a1 tarafýndan iþlenildi.
+Mesaj 0 a2 tarafýndan iþlenildi.
+Mesaj 1 a2 tarafýndan iþlenildi.
+Mesaj 2 a2 tarafýndan iþlenildi.
+Mesaj 3 a2 tarafýndan iþlenildi.
+Mesaj 4 a2 tarafýndan iþlenildi.
+Mesaj 6 a1 tarafýndan iþlenildi.
+Mesaj 7 a1 tarafýndan iþlenildi.
+Mesaj 8 a1 tarafýndan iþlenildi.
+Mesaj 9 a1 tarafýndan iþlenildi.
+```
+
+</details> 
+
+### Mesaage Filtering
+
+```csharp
+bufferBlock.LinkTo(a1, a => a % 2 == 0);
+```
+
+```
+Tamamlandý
+Mesaj 0 a2 tarafýndan iþlenildi.
+Mesaj 1 a2 tarafýndan iþlenildi.
+Mesaj 2 a2 tarafýndan iþlenildi.
+Mesaj 3 a2 tarafýndan iþlenildi.
+Mesaj 4 a2 tarafýndan iþlenildi.
+```
+Sonuç ne yazýkki istediðimiz gibi olmadý. Bunun nedeni bir önceki kodda da anlaþýlacaðý üzere ilk 5 mesajý a2 iþliyor. a1 tarafýna 5 msajý geliyor ve filtreden geçemiyor ve geçemediði için beklemede kalýyor ve dolayýsýyla a1 tamamlanamýyor.
+
+Bunun için aþaðýdaki gibi NullTarget DataFlowBlock eklenebilir. Bu bize reddidilmiþ olan block'lar için tamamlanabilir bir block saðlamýþ olacaktýr. Bu block'u da aþaðýdaki gibi LinkTo ile baðlayalým
+```csharp
+bufferBlock.LinkTo(a1, a => a % 2 == 0);
+bufferBlock.LinkTo(a2, new DataflowLinkOptions()
+{
+    Append = false,
+    MaxMessages = 4
+});
+
+bufferBlock.LinkTo(DataflowBlock.NullTarget<int>());
+for (int i = 0; i < 10; i++)
+{
+    await bufferBlock.SendAsync(i);
+}
+```
+
+```
+Tamamlandý
+Mesaj 4 a1 tarafýndan iþlenildi.
+Mesaj 0 a2 tarafýndan iþlenildi.
+Mesaj 1 a2 tarafýndan iþlenildi.
+Mesaj 2 a2 tarafýndan iþlenildi.
+Mesaj 3 a2 tarafýndan iþlenildi.
+Mesaj 6 a1 tarafýndan iþlenildi.
+Mesaj 8 a1 tarafýndan iþlenildi.
+```
+NullTarget yerine herhangi bir action block koyduðumuzda bu block reddedilen mesajlarý alacaktýr.
+
+```csharp
+bufferBlock.LinkTo(new ActionBlock<int>(a => Console.WriteLine($"{a} mesajý reddedildi.")));
+```
+
+```
+Tamamlandý
+Mesaj 4 a1 tarafýndan iþlenildi.
+5 mesajý reddedildi.
+7 mesajý reddedildi.
+9 mesajý reddedildi.
+Mesaj 0 a2 tarafýndan iþlenildi.
+Mesaj 1 a2 tarafýndan iþlenildi.
+Mesaj 2 a2 tarafýndan iþlenildi.
+Mesaj 3 a2 tarafýndan iþlenildi.
+Mesaj 6 a1 tarafýndan iþlenildi.
+Mesaj 8 a1 tarafýndan iþlenildi.
+```
+
+### Multiple Producers
+Daha önceki örneklerde birden fazla consumer ve bir producer vardý.
+Aþaðýdaki gibi LinkTo ile iki producer'ý ayný consumer'a aktarabiliriz.
+```csharp
+var producer1 = new TransformBlock<string,string>(a =>
+{
+    Task.Delay(150).Wait();
+    return a;
+});
+
+var producer2 = new TransformBlock<string, string>(a =>
+{
+    Task.Delay(300).Wait();
+    return a;
+});
+
+var printBlock = new ActionBlock<string>(n => Console.WriteLine(n));
+producer1.LinkTo(printBlock);
+producer2.LinkTo(printBlock);
+
+for (int i = 0; i < 10; i++)
+{
+    producer1.Post($"Producer 1 mesajý: {i}");
+    producer2.Post($"Producer 2 mesajý: {i}");
+}
+```
+```
+Tamamlandý
+Producer 1 mesajý: 0
+Producer 2 mesajý: 0
+Producer 1 mesajý: 1
+Producer 1 mesajý: 2
+Producer 2 mesajý: 1
+Producer 1 mesajý: 3
+Producer 1 mesajý: 4
+Producer 2 mesajý: 2
+Producer 1 mesajý: 5
+Producer 1 mesajý: 6
+Producer 2 mesajý: 3
+Producer 1 mesajý: 7
+Producer 1 mesajý: 8
+Producer 2 mesajý: 4
+Producer 1 mesajý: 9
+Producer 2 mesajý: 5
+Producer 2 mesajý: 6
+Producer 2 mesajý: 7
+Producer 2 mesajý: 8
+Producer 2 mesajý: 9
+```
+Kod içerisine completion metotlarýný ekleyelim. Burada completion için oluþturduðumuz extension metot ile PropagateCompletion deðerini güncellediðimizi de unutmayalým.
+
+```csharp
+var printBlock = new ActionBlock<string>(n => Console.WriteLine(n));
+producer1.LinkToWithPropagation(printBlock);
+producer2.LinkToWithPropagation(printBlock);
+
+for (int i = 0; i < 10; i++)
+{
+    producer1.Post($"Producer 1 mesajý: {i}");
+    producer2.Post($"Producer 2 mesajý: {i}");
+}
+producer1.Complete();
+producer2.Complete();
+printBlock.Completion.Wait();
+```
+Sonuç ne yazýkki istediðimiz gibi olmadý. Bazý mesajlar eksik kaldý. Bunun nedeni producer1 in tamamlandý komutunu göndermesiyle consumer'ýn da tamamlanmasý. Burada süreç tek yönlü olduðu için consumer producer2 ye tamamlanýp tamamlanmadýðýný sormadýðýndan tamamlandý olarak kabul edip yoluna devam etmekte.
+```
+Producer 1 mesajý: 0
+Producer 1 mesajý: 1
+Producer 2 mesajý: 0
+Producer 1 mesajý: 2
+Producer 2 mesajý: 1
+Producer 1 mesajý: 3
+Producer 1 mesajý: 4
+Producer 2 mesajý: 2
+Producer 1 mesajý: 5
+Producer 1 mesajý: 6
+Producer 2 mesajý: 3
+Producer 1 mesajý: 7
+Producer 1 mesajý: 8
+Producer 2 mesajý: 4
+Producer 1 mesajý: 9
+Tamamlandý
+```
+TPL Dataflow'u bir push mimarisidir. Producer consumer'ý bilir ancak tersi mümkün deðildir. Bu yüzden PropagateCompletion deðeri default olarak false'dur. Buradaki senaryo için TPL tarafýnda hazýr bir çözüm olmasa da Task.WhenAll ile her iki completion'ýn bittiði aný bulabilir ve printBlock'un da complete eventi ile süreci tamamlamýþ oluruz. Burada LinkTo kýsmý eski haline getirilmiþ yani propagation'lar kaldýrýlmýþtýr. 
+
+```csharp
+var printBlock = new ActionBlock<string>(n => Console.WriteLine(n));
+producer1.LinkTo(printBlock);
+producer2.LinkTo(printBlock);
+
+for (int i = 0; i < 10; i++)
+{
+    producer1.Post($"Producer 1 mesajý: {i}");
+    producer2.Post($"Producer 2 mesajý: {i}");
+}
+await Task.WhenAll(new[] { producer1.Completion, producer2.Completion }).ContinueWith(a=>printBlock.Complete());
+printBlock.Completion.Wait();
+```
+```
+Tamamlandý
+Producer 1 mesajý: 0
+Producer 2 mesajý: 0
+Producer 1 mesajý: 1
+Producer 1 mesajý: 2
+Producer 2 mesajý: 1
+Producer 1 mesajý: 3
+Producer 1 mesajý: 4
+Producer 2 mesajý: 2
+Producer 1 mesajý: 5
+Producer 1 mesajý: 6
+Producer 2 mesajý: 3
+Producer 1 mesajý: 7
+Producer 1 mesajý: 8
+Producer 2 mesajý: 4
+Producer 1 mesajý: 9
+Producer 2 mesajý: 5
+Producer 2 mesajý: 6
+Producer 2 mesajý: 7
+Producer 2 mesajý: 8
+Producer 2 mesajý: 9
+```
+
 ```csharp
 
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
+
+```
+```csharp
 
 ```
 

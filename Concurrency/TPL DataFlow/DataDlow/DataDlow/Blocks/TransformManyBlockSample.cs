@@ -31,10 +31,7 @@ namespace DataDlow.Blocks
                 {
                     yield return $"{number}:{i}";
                 }
-
             }
         }
-
-
     }
 }
