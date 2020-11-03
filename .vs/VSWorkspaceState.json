@@ -5,8 +5,9 @@
     "\\Concurrency",
     "\\Concurrency\\TPL DataFlow",
     "\\Concurrency\\TPL DataFlow\\DataDlow",
-    "\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow"
+    "\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow",
+    "\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow\\Parallelization-Filtering-Customization"
   ],
-  "SelectedNode": "\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow.sln",
+  "SelectedNode": "\\Concurrency\\Concurrency.md",
   "PreviewInSolutionExplorer": false
 }

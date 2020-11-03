@@ -1306,34 +1306,140 @@ Producer 2 mesajý: 9
 
 </details>
 
-```csharp
+### Error Handling
 
+```csharp
+var block = new ActionBlock<int>(n =>
+    {
+        if (n == 5)
+        {
+            throw new Exception("Hata mesajý!");
+        }
+        Console.WriteLine(n + " mesajý iþlenildi");
+    });
+for (int i = 0; i < 10; i++)
+{
+    block.Post(i);
+}
 ```
 
 <details>
 <summary>Result</summary> 
 
 ```
-
+Tamamlandý
+0 mesajý iþlenildi
+1 mesajý iþlenildi
+2 mesajý iþlenildi
+3 mesajý iþlenildi
+4 mesajý iþlenildi
 ```
-
 </details>
 
-```csharp
+Burada block tüm mesajlarý içerisine alýr ve hata olasýya kadar iþleme devam eder. Ancak ActionBlock yerine TransformBlock'a çevirip receive etmek isteseydik hata alacaktýk. Peki actionblock'ta gönderdiðimiz hata neredeydi. Bunun için completion'lar kullanýlýr. Bu þekilde fýrlattýðýmýz hata mesajý yazacaktýr.
 
+```csharp
+var block = new TransformBlock<int,int>(n =>
+    {
+        if (n == 5)
+        {
+            throw new Exception("Hata mesajý!");
+        }
+        Console.WriteLine(n + " mesajý iþlenildi");
+        return n;
+    });
+for (int i = 0; i < 10; i++)
+{
+    if(block.Post(i))
+    {
+        Console.WriteLine(i+" mesajý kabul edildi");
+    }
+    else
+    {
+        Console.WriteLine(i+" mesajý kabul reddedildi");
+    }
+}
+try
+{
+    block.Completion.Wait();
+}
+catch (AggregateException ae)
+{
+    Console.WriteLine(ae.Flatten().InnerException);
+}
 ```
 
 <details>
 <summary>Result</summary> 
 
 ```
-
+0 mesajý kabul edildi
+1 mesajý kabul edildi
+2 mesajý kabul edildi
+3 mesajý kabul edildi
+4 mesajý kabul edildi
+5 mesajý kabul edildi
+0 mesajý iþlenildi
+6 mesajý kabul edildi
+7 mesajý kabul edildi
+8 mesajý kabul edildi
+9 mesajý kabul edildi
+1 mesajý iþlenildi
+2 mesajý iþlenildi
+3 mesajý iþlenildi
+4 mesajý iþlenildi
+System.Exception: Hata mesajý!
+   at DataDlow.Parallelization_Filtering_Customization.ErrorSample...
 ```
 
 </details>
 
+### Custom Block 
 ```csharp
+public async Task Run()
+{
+    var increasingBlock = CreateFilteringBlock<int>();
+    var printBlock = new ActionBlock<int>(
+        a => Console.WriteLine(a + " mesajý alýndý."));
+    increasingBlock.LinkToWithPropagation(printBlock);
 
+    await increasingBlock.SendAsync(1);
+    await increasingBlock.SendAsync(2);
+    await increasingBlock.SendAsync(4);
+    await increasingBlock.SendAsync(1);
+    await increasingBlock.SendAsync(2);
+    await increasingBlock.SendAsync(9);
+
+    increasingBlock.Complete();
+    printBlock.Completion.Wait();
+
+}
+
+public static IPropagatorBlock<T, T> CreateFilteringBlock<T>() where T : IComparable<T>, new()
+{
+    T maxElement = default(T);
+    var source = new BufferBlock<T>();
+    var target = new ActionBlock<T>(async item =>
+        {
+            if (item.CompareTo(maxElement) > 0)
+            {
+                await source.SendAsync(item);
+                maxElement = item;
+            }
+        });
+    target.Completion.ContinueWith(a =>
+    {
+        if (a.IsFaulted)
+        {
+            ((ITargetBlock<T>)source).Fault(a.Exception);
+        }
+        else
+        {
+            source.Complete();
+        }
+    });
+    return DataflowBlock.Encapsulate(target, source);
+}
 ```
 
 <details>
