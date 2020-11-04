@@ -1,13 +1,6 @@
-### Kaynak
-https://www.dotnetcurry.com/patterns-practices/1412/dataflow-pattern-csharp-dotnet
-https://www.blinkingcaret.com/2019/05/15/tpl-dataflow-in-net-core-in-depth-part-1/
-https://csharppedia.com/en/tutorial/3110/task-parallel-library--tpl--dataflow-constructs
-
-#### Ek kaynak
-https://michaelscodingspot.com/pipeline-pattern-implementations-csharp/
 
 ### ActionBlock
-Action gibi çalışır ve bunları bir veri seti halinde tutar. Geri dönüş parametresi yoktur. İçerisindeki fonksiyonu asenkron olarak çalıştırır.
+Action gibi Ã§alÄ±ÅŸÄ±r ve bunlarÄ± bir veri seti halinde tutar. Geri dÃ¶nÃ¼ÅŸ parametresi yoktur. Ä°Ã§erisindeki fonksiyonu asenkron olarak Ã§alÄ±ÅŸtÄ±rÄ±r.
 ```csharp
 var actionBlock = new ActionBlock<int>(n =>
 {
@@ -25,7 +18,7 @@ for (int i = 0; i < 10; i++)
 
 
 ### TransformBlock
-Transform block veri alır ve veri döner. Aşağıdaki kodda int değer alıp string değer dönecektir. Burada diğerlerinden faklı olarak parallelism eklenilerek multithread kullanılmıştır.
+Transform block veri alÄ±r ve veri dÃ¶ner. AÅŸaÄŸÄ±daki kodda int deÄŸer alÄ±p string deÄŸer dÃ¶necektir. Burada diÄŸerlerinden faklÄ± olarak parallelism eklenilerek multithread kullanÄ±lmÄ±ÅŸtÄ±r.
 
 ```csharp
 ConcurrentBag<int> values = new ConcurrentBag<int>();
@@ -86,13 +79,13 @@ output count:0
 Result:8  Output count:1 input count:0 list item: 9
 output count:1
 Result:9  Output count:0 input count:0 list item: 8
-Tamamlandı
+TamamlandÄ±
 ```
 </details>
 
 ### BatchBlock
-Verileri grup halinde almak için kullanılır.
-Aşağıdaki örnekte 3'erli olarak getirecektir ve son 9 değeri son 3 lü sette tek değer olacağından gelmeyecektir ve uygulama receive kısımda beklemede kalacaktır. Bu da programın çalışmasını engelleyecektir. 
+Verileri grup halinde almak iÃ§in kullanÄ±lÄ±r.
+AÅŸaÄŸÄ±daki Ã¶rnekte 3'erli olarak getirecektir ve son 9 deÄŸeri son 3 lÃ¼ sette tek deÄŸer olacaÄŸÄ±ndan gelmeyecektir ve uygulama receive kÄ±sÄ±mda beklemede kalacaktÄ±r. Bu da programÄ±n Ã§alÄ±ÅŸmasÄ±nÄ± engelleyecektir. 
 ```csharp
 var batchBlock= new BatchBlock<int>(3);
 
@@ -119,7 +112,7 @@ Received batch 1:3 4 5
 Received batch 2:6 7 8
 ```
 
-Bunun için batchBlock.**Complete();** ve TryReceive metotları kullanılır. Burada dikkat edilmesi gereken bir noktada complete edildikten sonra post edilenlerin ignore edilmesidir.
+Bunun iÃ§in batchBlock.**Complete();** ve TryReceive metotlarÄ± kullanÄ±lÄ±r. Burada dikkat edilmesi gereken bir noktada complete edildikten sonra post edilenlerin ignore edilmesidir.
 
 ```csharp
 var batchBlock = new BatchBlock<int>(3);
@@ -162,8 +155,8 @@ The block finished
 ```
 
 ### TransformManyBlock
-Batch block'un tam tersidir. Tek bir mesaj alır ve birden fazla item döner. 
-Burada iki tane block var ancak bu ikisini birbirine bağlamamız gerekmektedir. Bunun için **LintTo** metodu ile source block'u consumer block'a iletebiliriz.
+Batch block'un tam tersidir. Tek bir mesaj alÄ±r ve birden fazla item dÃ¶ner. 
+Burada iki tane block var ancak bu ikisini birbirine baÄŸlamamÄ±z gerekmektedir. Bunun iÃ§in **LintTo** metodu ile source block'u consumer block'a iletebiliriz.
 
 
 ```csharp
@@ -171,7 +164,7 @@ public void Run()
 {
     var transformManyBlock = new TransformManyBlock<int, string>(a => FindEvenNumbers(a));
 
-    var printBlock = new ActionBlock<string>(a => Console.WriteLine($"Alınan mesaj:{a}"));
+    var printBlock = new ActionBlock<string>(a => Console.WriteLine($"AlÄ±nan mesaj:{a}"));
 
     transformManyBlock.LinkTo(printBlock);
 
@@ -179,7 +172,7 @@ public void Run()
     {
         transformManyBlock.Post(i);
     }
-    Console.WriteLine("Tamamlandı.");
+    Console.WriteLine("TamamlandÄ±.");
 }
 
 private IEnumerable<string> FindEvenNumbers(int number)
@@ -198,43 +191,43 @@ private IEnumerable<string> FindEvenNumbers(int number)
 <summary>Result</summary> 
 
 ```
-Tamamlandı.
-Alınan mesaj:1:0
-Alınan mesaj:2:0
-Alınan mesaj:3:0
-Alınan mesaj:3:2
-Alınan mesaj:4:0
-Alınan mesaj:4:2
-Alınan mesaj:5:0
-Alınan mesaj:5:2
-Alınan mesaj:5:4
-Alınan mesaj:6:0
-Alınan mesaj:6:2
-Alınan mesaj:6:4
-Alınan mesaj:7:0
-Alınan mesaj:7:2
-Alınan mesaj:7:4
-Alınan mesaj:7:6
-Alınan mesaj:8:0
-Alınan mesaj:8:2
-Alınan mesaj:8:4
-Alınan mesaj:8:6
-Alınan mesaj:9:0
-Alınan mesaj:9:2
-Alınan mesaj:9:4
-Alınan mesaj:9:6
-Alınan mesaj:9:8
+TamamlandÄ±.
+AlÄ±nan mesaj:1:0
+AlÄ±nan mesaj:2:0
+AlÄ±nan mesaj:3:0
+AlÄ±nan mesaj:3:2
+AlÄ±nan mesaj:4:0
+AlÄ±nan mesaj:4:2
+AlÄ±nan mesaj:5:0
+AlÄ±nan mesaj:5:2
+AlÄ±nan mesaj:5:4
+AlÄ±nan mesaj:6:0
+AlÄ±nan mesaj:6:2
+AlÄ±nan mesaj:6:4
+AlÄ±nan mesaj:7:0
+AlÄ±nan mesaj:7:2
+AlÄ±nan mesaj:7:4
+AlÄ±nan mesaj:7:6
+AlÄ±nan mesaj:8:0
+AlÄ±nan mesaj:8:2
+AlÄ±nan mesaj:8:4
+AlÄ±nan mesaj:8:6
+AlÄ±nan mesaj:9:0
+AlÄ±nan mesaj:9:2
+AlÄ±nan mesaj:9:4
+AlÄ±nan mesaj:9:6
+AlÄ±nan mesaj:9:8
 ```
 </details>
 
-Yine aynı şekilde multithread kullanmak için aşağıdaki kod kullanılabilir.
+Yine aynÄ± ÅŸekilde multithread kullanmak iÃ§in aÅŸaÄŸÄ±daki kod kullanÄ±labilir.
 ```csharp
 var transformManyBlock = new TransformManyBlock<int, string>(a => FindEvenNumbers(a),
     new ExecutionDataflowBlockOptions() { MaxDegreeOfParallelism = 5 });
 ```
 
 ### BufferBlock
-Mesajı tüketici alasıya kadar saklamada kullanılır. Örnek olarak birden fazla source block'lar (action, transformblock vs.) olsun. Bunların iletileceği consumer block'lar da tanımlansın. Bu iki block'lar arasındaki ilişki buffer block üzerinde tanımlanır. Buffer block **BoundedCapacity=1** property değeri ile alınan mesajların kaç consumer üzerine dağıtılacağını ayarlar. Bir nevi load balancer görevi görür. Default olarak öncelikle ilk consumer'a gider ve devamında consumer mesajı kabul ederse diğerlerine ilk consumer mesajı reddetmediği sürece hiçbir zaman gitmez. Bu durumda tüm alıcılarda 'BoundedCapacity' değerleri 1 olarak verildiğinde dengeli olarak mesajlar dağıtılacaktır.
+MesajÄ± tÃ¼ketici alasÄ±ya kadar saklamada kullanÄ±lÄ±r. Ã–rnek olarak birden fazla source block'lar (action, transformblock vs.) olsun. BunlarÄ±n iletileceÄŸi consumer block'lar da tanÄ±mlansÄ±n. Bu iki block'lar arasÄ±ndaki iliÅŸki buffer block Ã¼zerinde tanÄ±mlanÄ±r. Buffer block **BoundedCapacity=1** property deÄŸeri ile alÄ±nan mesajlarÄ±n kaÃ§ consumer Ã¼zerine daÄŸÄ±tÄ±lacaÄŸÄ±nÄ± ayarlar. Bir nevi load balancer gÃ¶revi gÃ¶rÃ¼r. Default olarak Ã¶ncelikle ilk consumer'a gider ve devamÄ±nda consumer mesajÄ± kabul ederse diÄŸerlerine ilk consumer mesajÄ± reddetmediÄŸi sÃ¼rece hiÃ§bir zaman gitmez. Bu durumda tÃ¼m alÄ±cÄ±larda 'BoundedCapacity' deÄŸerleri 1 olarak verildiÄŸinde dengeli olarak mesajlar daÄŸÄ±tÄ±lacaktÄ±r.
 https://www.blinkingcaret.com/2019/06/05/tpl-dataflow-in-net-core-in-depth-part-2/
 
 ![Buffer Block](../Files/bufferBlock.png)
@@ -252,21 +245,21 @@ for (int i = 0; i < 10; i++)
     Console.WriteLine(result);
 }
 ```
-İlgili örnekte iki action block mevcut ve buffer block ise gelen veriyi bu consumer block'lara aktaracaktır.
+Ä°lgili Ã¶rnekte iki action block mevcut ve buffer block ise gelen veriyi bu consumer block'lara aktaracaktÄ±r.
 
 ```csharp
 var bufferBlock = new BufferBlock<int>();
 
 var a1 = new ActionBlock<int>(a =>
     {
-        Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+        Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
         Task.Delay(300).Wait();
     });
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 });
 
@@ -283,32 +276,32 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-Mesaj 0 a1 tarafından işlenildi.
-Mesaj 1 a1 tarafından işlenildi.
-Mesaj 2 a1 tarafından işlenildi.
-Mesaj 3 a1 tarafından işlenildi.
-Mesaj 4 a1 tarafından işlenildi.
-Mesaj 5 a1 tarafından işlenildi.
-Mesaj 6 a1 tarafından işlenildi.
-Mesaj 7 a1 tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenildi.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
-Burada dikkat edileceği üzere default ayarlar değiştirilmediği için her zaman ilk alıcı çalıştırılacaktır. Bunun için consumer'lar üzerinden BoundedCapacity bilgisi set edilir.
+Burada dikkat edileceÄŸi Ã¼zere default ayarlar deÄŸiÅŸtirilmediÄŸi iÃ§in her zaman ilk alÄ±cÄ± Ã§alÄ±ÅŸtÄ±rÄ±lacaktÄ±r. Bunun iÃ§in consumer'lar Ã¼zerinden BoundedCapacity bilgisi set edilir.
 
 ```csharp
 var a1 = new ActionBlock<int>(a =>
     {
-        Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+        Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
         Task.Delay(300).Wait();
     },new ExecutionDataflowBlockOptions() { BoundedCapacity = 1});
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 }, new ExecutionDataflowBlockOptions() { BoundedCapacity = 1 });
 ```
@@ -317,36 +310,36 @@ var a2 = new ActionBlock<int>(a =>
 <summary>Result</summary> 
 
 ```
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 0 a1 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a1 tarafından işlenildi.
-Mesaj 4 a2 tarafından işlenildi.
-Mesaj 5 a1 tarafından işlenildi.
-Mesaj 6 a2 tarafından işlenildi.
-Mesaj 7 a1 tarafından işlenildi.
-Mesaj 8 a2 tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
-Burada a1 e 10 değerin vermiş olsaydık hepsini a1 den işletmiş olacaktı. Çünkü gönderilen mesaj kapasitesi ve alacağı mesaj kapasitesi aynı. İlk başta sürekli a1'e düşmesinin nedeni ise default değerin -1 yani işlemsel olarak sonsuz mesajı alabiliyor olması anlamına geliyordu. Bu yüzden hiçbir zaman a2'ye düşmeyecekti.
+Burada a1 e 10 deÄŸerin vermiÅŸ olsaydÄ±k hepsini a1 den iÅŸletmiÅŸ olacaktÄ±. Ã‡Ã¼nkÃ¼ gÃ¶nderilen mesaj kapasitesi ve alacaÄŸÄ± mesaj kapasitesi aynÄ±. Ä°lk baÅŸta sÃ¼rekli a1'e dÃ¼ÅŸmesinin nedeni ise default deÄŸerin -1 yani iÅŸlemsel olarak sonsuz mesajÄ± alabiliyor olmasÄ± anlamÄ±na geliyordu. Bu yÃ¼zden hiÃ§bir zaman a2'ye dÃ¼ÅŸmeyecekti.
 
-Aynı şekilde buffer block için de BoundedCapacity ayarlayabilirdik burada BufferBlock sonsuz mesaj alırsa request çok olursa outofmemory hatası alınabilir. Ancak 1 olarak ayarladığımızda sadece bir mesajı işleyecekti. Bunun nedeni post metodu ile veri gönderdiğimizde bu metot eğer kapasite dolmuşsa gönderim reddedilecek ve false dönecektir. Bu durumda mesajları reject olmadan SendAsync() metodu aracılığıyla göderebiliriz. Bu şekilde BoundedCapacity 1 bile olsa bir mesaj gönderildikten sonra bir diğerini gönderebilir.
+AynÄ± ÅŸekilde buffer block iÃ§in de BoundedCapacity ayarlayabilirdik burada BufferBlock sonsuz mesaj alÄ±rsa request Ã§ok olursa outofmemory hatasÄ± alÄ±nabilir. Ancak 1 olarak ayarladÄ±ÄŸÄ±mÄ±zda sadece bir mesajÄ± iÅŸleyecekti. Bunun nedeni post metodu ile veri gÃ¶nderdiÄŸimizde bu metot eÄŸer kapasite dolmuÅŸsa gÃ¶nderim reddedilecek ve false dÃ¶necektir. Bu durumda mesajlarÄ± reject olmadan SendAsync() metodu aracÄ±lÄ±ÄŸÄ±yla gÃ¶derebiliriz. Bu ÅŸekilde BoundedCapacity 1 bile olsa bir mesaj gÃ¶nderildikten sonra bir diÄŸerini gÃ¶nderebilir.
 
 ```csharp
 var bufferBlock = new BufferBlock<int>(new DataflowBlockOptions() { BoundedCapacity = 1 });
 
 var a1 = new ActionBlock<int>(a =>
     {
-        Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+        Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
         Task.Delay(300).Wait();
     },new ExecutionDataflowBlockOptions() { BoundedCapacity = 1});
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 }, new ExecutionDataflowBlockOptions() { BoundedCapacity = 1 });
 
@@ -359,11 +352,11 @@ for (int i = 0; i < 10; i++)
     {
         if (a.Result)
         {
-            Console.WriteLine($"{i} mesajı kabul edildi.");
+            Console.WriteLine($"{i} mesajÄ± kabul edildi.");
         }
         else
         {
-            Console.WriteLine($"{i} mesajı reddedildi.");
+            Console.WriteLine($"{i} mesajÄ± reddedildi.");
         }
     });
 }
@@ -373,47 +366,47 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-1 mesajı kabul edildi.
-Mesaj 0 a1 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 2 a1 tarafından işlenildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 4 a1 tarafından işlenildi.
-10 mesajı kabul edildi.
-Mesaj 5 a2 tarafından işlenildi.
-10 mesajı kabul edildi.
-Mesaj 6 a1 tarafından işlenildi.
-10 mesajı kabul edildi.
-Mesaj 7 a2 tarafından işlenildi.
-10 mesajı kabul edildi.
-Mesaj 8 a1 tarafından işlenildi.
-10 mesajı kabul edildi.
-Mesaj 9 a2 tarafından işlenildi.
+TamamlandÄ±
+1 mesajÄ± kabul edildi.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+Mesaj 5 a2 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+Mesaj 7 a2 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
+10 mesajÄ± kabul edildi.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
 
 ### BroadcastBlock
-Mesajı birden fazla alıcıya gönderir. Burada mesajdan kasıt class instance'larıdır. Gönderilen mesaj birden fazla alıcıya ulaştığında her bir mesaj aynı instance'ı paylaşır.
+MesajÄ± birden fazla alÄ±cÄ±ya gÃ¶nderir. Burada mesajdan kasÄ±t class instance'larÄ±dÄ±r. GÃ¶nderilen mesaj birden fazla alÄ±cÄ±ya ulaÅŸtÄ±ÄŸÄ±nda her bir mesaj aynÄ± instance'Ä± paylaÅŸÄ±r.
 
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a, new DataflowBlockOptions() { BoundedCapacity = 1 });
 
 var a1 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 }, new ExecutionDataflowBlockOptions() { BoundedCapacity = 1 });
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 }, new ExecutionDataflowBlockOptions() { BoundedCapacity = 1 });
 
@@ -426,54 +419,54 @@ for (int i = 0; i < 10; i++)
     {
         if (a.Result)
         {
-            Console.WriteLine($"{i} mesajı kabul edildi.");
+            Console.WriteLine($"{i} mesajÄ± kabul edildi.");
         }
         else
         {
-            Console.WriteLine($"{i} mesajı reddedildi.");
+            Console.WriteLine($"{i} mesajÄ± reddedildi.");
         }
     });
 }
 ```
-Burada tüm mesajların başarılı bir şekilde kabul edildi ancak sadece ikisi işlenildir.
+Burada tÃ¼m mesajlarÄ±n baÅŸarÄ±lÄ± bir ÅŸekilde kabul edildi ancak sadece ikisi iÅŸlenildir.
 
 <details>
 <summary>Result</summary> 
 
 ```
-1 mesajı kabul edildi.
-Tamamlandı
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 0 a1 tarafından işlenildi.
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenildi.
-Mesaj 9 a2 tarafından işlenildi.
+1 mesajÄ± kabul edildi.
+TamamlandÄ±
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
-Bir mesaj bir yerden reject aldığında tekrar gönderim yapılmaz. Eğer boundedcapacity değerleri kaldırılırsa işleyiş de değişecektir.
+Bir mesaj bir yerden reject aldÄ±ÄŸÄ±nda tekrar gÃ¶nderim yapÄ±lmaz. EÄŸer boundedcapacity deÄŸerleri kaldÄ±rÄ±lÄ±rsa iÅŸleyiÅŸ de deÄŸiÅŸecektir.
 
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a);
 
 var a1 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 });
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 });
 ```
@@ -481,50 +474,50 @@ var a2 = new ActionBlock<int>(a =>
 <summary>Result</summary> 
 
 ```
-10 mesajı kabul edildi.
-Tamamlandı
-8 mesajı kabul edildi.
-8 mesajı kabul edildi.
-8 mesajı kabul edildi.
-10 mesajı kabul edildi.
-9 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 0 a1 tarafından işlenildi.
-Mesaj 1 a1 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 2 a1 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a1 tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 4 a1 tarafından işlenildi.
-Mesaj 4 a2 tarafından işlenildi.
-Mesaj 5 a2 tarafından işlenildi.
-Mesaj 5 a1 tarafından işlenildi.
-Mesaj 6 a2 tarafından işlenildi.
-Mesaj 6 a1 tarafından işlenildi.
-Mesaj 7 a1 tarafından işlenildi.
-Mesaj 7 a2 tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenildi.
-Mesaj 8 a2 tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenildi.
-Mesaj 9 a2 tarafından işlenildi.
+10 mesajÄ± kabul edildi.
+TamamlandÄ±
+8 mesajÄ± kabul edildi.
+8 mesajÄ± kabul edildi.
+8 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+9 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
 ### JoinBlock
 
-JoinBlock birden fazla blockları birleştirerek başka block'a aktarımı mümkün kılar.
+JoinBlock birden fazla blocklarÄ± birleÅŸtirerek baÅŸka block'a aktarÄ±mÄ± mÃ¼mkÃ¼n kÄ±lar.
 
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a);
 
 var a1 = new TransformBlock<int,int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenilmekte.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenilmekte.");
     Task.Delay(300).Wait();
     return a;
 });
@@ -532,7 +525,7 @@ var a1 = new TransformBlock<int,int>(a =>
 
 var a2 = new TransformBlock<int,int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenilmekte.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenilmekte.");
     Task.Delay(300).Wait();
     return a;
 });
@@ -543,7 +536,7 @@ broadcastBlock.LinkTo(a2);
 var joinBlock = new JoinBlock<int, int>();
 a1.LinkTo(joinBlock.Target1);
 a2.LinkTo(joinBlock.Target2);
-var printBlock = new ActionBlock<Tuple<int,int>>(a => Console.WriteLine($"{a} mesajı print block tarafından işlenildi."));
+var printBlock = new ActionBlock<Tuple<int,int>>(a => Console.WriteLine($"{a} mesajÄ± print block tarafÄ±ndan iÅŸlenildi."));
 
 joinBlock.LinkTo(printBlock);
 
@@ -553,11 +546,11 @@ for (int i = 0; i < 10; i++)
     {
         if (a.Result)
         {
-            Console.WriteLine($"{i} mesajı kabul edildi.");
+            Console.WriteLine($"{i} mesajÄ± kabul edildi.");
         }
         else
         {
-            Console.WriteLine($"{i} mesajı reddedildi.");
+            Console.WriteLine($"{i} mesajÄ± reddedildi.");
         }
     });
 }
@@ -567,57 +560,57 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-4 mesajı kabul edildi.
-4 mesajı kabul edildi.
-4 mesajı kabul edildi.
-4 mesajı kabul edildi.
-8 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 0 a1 tarafından işlenilmekte.
-Mesaj 0 a2 tarafından işlenilmekte.
-Mesaj 1 a2 tarafından işlenilmekte.
-Mesaj 1 a1 tarafından işlenilmekte.
-(0, 0) mesajı print block tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenilmekte.
-Mesaj 2 a1 tarafından işlenilmekte.
-(1, 1) mesajı print block tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenilmekte.
-Mesaj 3 a1 tarafından işlenilmekte.
-(2, 2) mesajı print block tarafından işlenildi.
-Mesaj 4 a2 tarafından işlenilmekte.
-Mesaj 4 a1 tarafından işlenilmekte.
-(3, 3) mesajı print block tarafından işlenildi.
-Mesaj 5 a1 tarafından işlenilmekte.
-Mesaj 5 a2 tarafından işlenilmekte.
-(4, 4) mesajı print block tarafından işlenildi.
-Mesaj 6 a2 tarafından işlenilmekte.
-Mesaj 6 a1 tarafından işlenilmekte.
-(5, 5) mesajı print block tarafından işlenildi.
-Mesaj 7 a1 tarafından işlenilmekte.
-Mesaj 7 a2 tarafından işlenilmekte.
-(6, 6) mesajı print block tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenilmekte.
-Mesaj 8 a2 tarafından işlenilmekte.
-(7, 7) mesajı print block tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenilmekte.
-(8, 8) mesajı print block tarafından işlenildi.
-Mesaj 9 a2 tarafından işlenilmekte.
-(9, 9) mesajı print block tarafından işlenildi.
+TamamlandÄ±
+4 mesajÄ± kabul edildi.
+4 mesajÄ± kabul edildi.
+4 mesajÄ± kabul edildi.
+4 mesajÄ± kabul edildi.
+8 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 1 a1 tarafÄ±ndan iÅŸlenilmekte.
+(0, 0) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenilmekte.
+(1, 1) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenilmekte.
+(2, 2) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenilmekte.
+(3, 3) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 5 a2 tarafÄ±ndan iÅŸlenilmekte.
+(4, 4) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenilmekte.
+(5, 5) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 7 a2 tarafÄ±ndan iÅŸlenilmekte.
+(6, 6) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 8 a2 tarafÄ±ndan iÅŸlenilmekte.
+(7, 7) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenilmekte.
+(8, 8) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenilmekte.
+(9, 9) mesajÄ± print block tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
-Multithread ve çalışma sürelerinde biraz oynama yaparsak çalışma sırası yine değişmeyecektir.
+Multithread ve Ã§alÄ±ÅŸma sÃ¼relerinde biraz oynama yaparsak Ã§alÄ±ÅŸma sÄ±rasÄ± yine deÄŸiÅŸmeyecektir.
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a);
 
 var a1 = new TransformBlock<int,int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenilmekte.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenilmekte.");
     Task.Delay(300).Wait();
     if (a%2==0)
     {
@@ -633,7 +626,7 @@ var a1 = new TransformBlock<int,int>(a =>
 
 var a2 = new TransformBlock<int,int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenilmekte.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenilmekte.");
     Task.Delay(150).Wait();
     return a;
 }, new ExecutionDataflowBlockOptions() { MaxDegreeOfParallelism = 8 });
@@ -644,7 +637,7 @@ broadcastBlock.LinkTo(a2);
 var joinBlock = new JoinBlock<int, int>();
 a1.LinkTo(joinBlock.Target1);
 a2.LinkTo(joinBlock.Target2);
-var printBlock = new ActionBlock<Tuple<int,int>>(a => Console.WriteLine($"{a} mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: {a.Item1+a.Item2}"));
+var printBlock = new ActionBlock<Tuple<int,int>>(a => Console.WriteLine($"{a} mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: {a.Item1+a.Item2}"));
 
 joinBlock.LinkTo(printBlock);
 
@@ -654,11 +647,11 @@ for (int i = 0; i < 10; i++)
     {
         if (a.Result)
         {
-            Console.WriteLine($"{i} mesajı kabul edildi.");
+            Console.WriteLine($"{i} mesajÄ± kabul edildi.");
         }
         else
         {
-            Console.WriteLine($"{i} mesajı reddedildi.");
+            Console.WriteLine($"{i} mesajÄ± reddedildi.");
         }
     });
 }
@@ -669,58 +662,58 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-6 mesajı kabul edildi.
-Tamamlandı
-10 mesajı kabul edildi.
-4 mesajı kabul edildi.
-6 mesajı kabul edildi.
-6 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 0 a2 tarafından işlenilmekte.
-Mesaj 2 a2 tarafından işlenilmekte.
-Mesaj 1 a2 tarafından işlenilmekte.
-Mesaj 3 a2 tarafından işlenilmekte.
-Mesaj 4 a2 tarafından işlenilmekte.
-Mesaj 0 a1 tarafından işlenilmekte.
-Mesaj 1 a1 tarafından işlenilmekte.
-Mesaj 2 a1 tarafından işlenilmekte.
-Mesaj 5 a2 tarafından işlenilmekte.
-Mesaj 6 a2 tarafından işlenilmekte.
-Mesaj 7 a2 tarafından işlenilmekte.
-Mesaj 8 a2 tarafından işlenilmekte.
-Mesaj 9 a2 tarafından işlenilmekte.
-Mesaj 3 a1 tarafından işlenilmekte.
-Mesaj 4 a1 tarafından işlenilmekte.
-Mesaj 5 a1 tarafından işlenilmekte.
-(0, 0) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-(-1, 1) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-(-2, 2) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-Mesaj 6 a1 tarafından işlenilmekte.
-(-3, 3) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-Mesaj 7 a1 tarafından işlenilmekte.
-Mesaj 8 a1 tarafından işlenilmekte.
-(-4, 4) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-(-5, 5) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-Mesaj 9 a1 tarafından işlenilmekte.
-(-6, 6) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-(-7, 7) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-(-8, 8) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
-(-9, 9) mesajı print block tarafından işlenildi. Değerler toplamı her zaman 0 dönecektir: 0
+6 mesajÄ± kabul edildi.
+TamamlandÄ±
+10 mesajÄ± kabul edildi.
+4 mesajÄ± kabul edildi.
+6 mesajÄ± kabul edildi.
+6 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 1 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 5 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 6 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 7 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 8 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenilmekte.
+(0, 0) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+(-1, 1) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+(-2, 2) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenilmekte.
+(-3, 3) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenilmekte.
+(-4, 4) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+(-5, 5) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenilmekte.
+(-6, 6) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+(-7, 7) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+(-8, 8) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
+(-9, 9) mesajÄ± print block tarafÄ±ndan iÅŸlenildi. DeÄŸerler toplamÄ± her zaman 0 dÃ¶necektir: 0
 ```
 </details>
 
 ### BatchedJoinBlock
-JoingBlock gibi çalışır ama BatchedBlock gibi birden fazla öğeyi toplu halde alarak işlem yapar. Ancak burada sıralama her çalışmada farklı çalışacaktır.
+JoingBlock gibi Ã§alÄ±ÅŸÄ±r ama BatchedBlock gibi birden fazla Ã¶ÄŸeyi toplu halde alarak iÅŸlem yapar. Ancak burada sÄ±ralama her Ã§alÄ±ÅŸmada farklÄ± Ã§alÄ±ÅŸacaktÄ±r.
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a);
 
 var a1 = new TransformBlock<int, int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenilmekte.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenilmekte.");
     Task.Delay(300).Wait();
     if (a % 2 == 0)
     {
@@ -736,7 +729,7 @@ var a1 = new TransformBlock<int, int>(a =>
 
 var a2 = new TransformBlock<int, int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenilmekte.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenilmekte.");
     Task.Delay(150).Wait();
     return a;
 }, new ExecutionDataflowBlockOptions() { MaxDegreeOfParallelism = 3 });
@@ -747,7 +740,7 @@ broadcastBlock.LinkTo(a2);
 var joinBlock = new BatchedJoinBlock<int, int>(3);
 a1.LinkTo(joinBlock.Target1);
 a2.LinkTo(joinBlock.Target2);
-var printBlock = new ActionBlock<Tuple<IList<int>, IList<int>>>(a => Console.WriteLine($"{a} mesajı print block tarafından işlenildi.[{string.Join(',', a.Item1)}] , [{string.Join(',', a.Item2)}]"));
+var printBlock = new ActionBlock<Tuple<IList<int>, IList<int>>>(a => Console.WriteLine($"{a} mesajÄ± print block tarafÄ±ndan iÅŸlenildi.[{string.Join(',', a.Item1)}] , [{string.Join(',', a.Item2)}]"));
 
 joinBlock.LinkTo(printBlock);
 
@@ -757,11 +750,11 @@ for (int i = 0; i < 10; i++)
     {
         if (a.Result)
         {
-            Console.WriteLine($"{i} mesajı kabul edildi.");
+            Console.WriteLine($"{i} mesajÄ± kabul edildi.");
         }
         else
         {
-            Console.WriteLine($"{i} mesajı reddedildi.");
+            Console.WriteLine($"{i} mesajÄ± reddedildi.");
         }
     });
 }
@@ -771,48 +764,48 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-2 mesajı kabul edildi.
-4 mesajı kabul edildi.
-3 mesajı kabul edildi.
-6 mesajı kabul edildi.
-6 mesajı kabul edildi.
-9 mesajı kabul edildi.
-Tamamlandı
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-10 mesajı kabul edildi.
-Mesaj 0 a2 tarafından işlenilmekte.
-Mesaj 1 a2 tarafından işlenilmekte.
-Mesaj 2 a2 tarafından işlenilmekte.
-Mesaj 0 a1 tarafından işlenilmekte.
-Mesaj 2 a1 tarafından işlenilmekte.
-Mesaj 1 a1 tarafından işlenilmekte.
-Mesaj 3 a2 tarafından işlenilmekte.
-Mesaj 4 a2 tarafından işlenilmekte.
-Mesaj 5 a2 tarafından işlenilmekte.
+2 mesajÄ± kabul edildi.
+4 mesajÄ± kabul edildi.
+3 mesajÄ± kabul edildi.
+6 mesajÄ± kabul edildi.
+6 mesajÄ± kabul edildi.
+9 mesajÄ± kabul edildi.
+TamamlandÄ±
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+10 mesajÄ± kabul edildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 1 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 5 a2 tarafÄ±ndan iÅŸlenilmekte.
 Mesaj: [] , [0,1,2]
-Mesaj 6 a2 tarafından işlenilmekte.
-Mesaj 7 a2 tarafından işlenilmekte.
-Mesaj 8 a2 tarafından işlenilmekte.
+Mesaj 6 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 7 a2 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 8 a2 tarafÄ±ndan iÅŸlenilmekte.
 Mesaj: [] , [3,4,5]
-Mesaj 3 a1 tarafından işlenilmekte.
-Mesaj 9 a2 tarafından işlenilmekte.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenilmekte.
 Mesaj: [] , [6,7,8]
-Mesaj 4 a1 tarafından işlenilmekte.
-Mesaj 5 a1 tarafından işlenilmekte.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenilmekte.
 Mesaj: [0,-1,-2] , []
-Mesaj 6 a1 tarafından işlenilmekte.
-Mesaj 7 a1 tarafından işlenilmekte.
-Mesaj 8 a1 tarafından işlenilmekte.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenilmekte.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenilmekte.
 Mesaj: [-3,-4] , [9]
-Mesaj 9 a1 tarafından işlenilmekte.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenilmekte.
 Mesaj: [-5,-6,-7] , []
 ```
 </details>
 
 ### WriteOnceBlock
-Adından da anlaşılacağı gibi tek bir mesajı kabul eder ve diğerlerini reddeder ve aynı yanıtı döner.
+AdÄ±ndan da anlaÅŸÄ±lacaÄŸÄ± gibi tek bir mesajÄ± kabul eder ve diÄŸerlerini reddeder ve aynÄ± yanÄ±tÄ± dÃ¶ner.
 
 ```csharp
 var block = new WriteOnceBlock<int>(a => a);
@@ -835,7 +828,7 @@ for (int i = 0; i < 15; i++)
     }
     else
     {
-        Console.WriteLine("Mesaj alınamadı.");
+        Console.WriteLine("Mesaj alÄ±namadÄ±.");
     }
 }
 ```
@@ -868,11 +861,11 @@ Mesaj 0 kabul edildi. Iteration 11
 Mesaj 0 kabul edildi. Iteration 12
 Mesaj 0 kabul edildi. Iteration 13
 Mesaj 0 kabul edildi. Iteration 14
-Tamamlandı
+TamamlandÄ±
 ```
 </details>
 
-Eğer receive metodu yerine başka bir block'a gönderim yapacak olsaydık sadece tek bir sefer çalıştığını görebiliriz.
+EÄŸer receive metodu yerine baÅŸka bir block'a gÃ¶nderim yapacak olsaydÄ±k sadece tek bir sefer Ã§alÄ±ÅŸtÄ±ÄŸÄ±nÄ± gÃ¶rebiliriz.
 ```csharp
 var block = new WriteOnceBlock<int>(a => a);
 var print = new ActionBlock<int>(a => Console.WriteLine($"Mesaj {a} kabul edildi."));
@@ -904,26 +897,26 @@ Mesaj 6 reddedildi
 Mesaj 7 reddedildi
 Mesaj 8 reddedildi
 Mesaj 9 reddedildi
-Tamamlandı
+TamamlandÄ±
 Mesaj 0 kabul edildi.
 ```
 </details>
 
 ### Completion
-BroadcastBlock örneğindeki sendasync metodunu aşağıdaki gibi değiştirelim. Bu durumda Console.ReadLine kodunu kaldırdığımızda ilgili mesaj bilgileri ekrana yazılmayacaktır. Bunun nedeni ilgili kod bloğunun farklı thread'de çalışmasıdır ve ReadLine ile bir bekleme yaptığımız için sonuçları görüntüleyebiliyorduk ancak bu kodu kaldırdığımızda kodu bekleten bir şey olmadığı için sonuç ekrana yansımadan Main metodu tamamlanmış olacaktır. Bunu çözmek için ilgili thread'de çalışan kodun tamamlanmasını beklememiz gerekmektedir.
+BroadcastBlock Ã¶rneÄŸindeki sendasync metodunu aÅŸaÄŸÄ±daki gibi deÄŸiÅŸtirelim. Bu durumda Console.ReadLine kodunu kaldÄ±rdÄ±ÄŸÄ±mÄ±zda ilgili mesaj bilgileri ekrana yazÄ±lmayacaktÄ±r. Bunun nedeni ilgili kod bloÄŸunun farklÄ± thread'de Ã§alÄ±ÅŸmasÄ±dÄ±r ve ReadLine ile bir bekleme yaptÄ±ÄŸÄ±mÄ±z iÃ§in sonuÃ§larÄ± gÃ¶rÃ¼ntÃ¼leyebiliyorduk ancak bu kodu kaldÄ±rdÄ±ÄŸÄ±mÄ±zda kodu bekleten bir ÅŸey olmadÄ±ÄŸÄ± iÃ§in sonuÃ§ ekrana yansÄ±madan Main metodu tamamlanmÄ±ÅŸ olacaktÄ±r. Bunu Ã§Ã¶zmek iÃ§in ilgili thread'de Ã§alÄ±ÅŸan kodun tamamlanmasÄ±nÄ± beklememiz gerekmektedir.
 ```csharp
 var broadcastBlock = new BroadcastBlock<int>(a => a);
 
 var a1 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 });
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
 });
 
@@ -934,13 +927,13 @@ for (int i = 0; i < 10; i++)
 {
     await broadcastBlock.SendAsync(i);
 }
-Console.WriteLine("Tamamlandı");
+Console.WriteLine("TamamlandÄ±");
 //Console.ReadLine();
 ```
 
 
 ```
-Tamamlandı
+TamamlandÄ±
 
 C:\Users\Nuri\...\TPL DataFlow\DataDlow\DataDlow\bin\Debug\netcoreapp3.1\DataDlow.exe (process 18700) exited with code 0.
 To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
@@ -948,7 +941,7 @@ Press any key to close this window . .
 
 ```
 
-Block'un süreçlerinin tamamlanıp tamamlanmadığını öğrenmek için block içerisinde mesajın olup olmadığına ya da completed eventi kontrol edilir. Bunun için linkto içerisinde **PropagateCompletion** true olarak set edilmeli ve *broadcastBlock.Complete(); finalBlock.Completion.Wait();* metotları çağırılmalıdır.
+Block'un sÃ¼reÃ§lerinin tamamlanÄ±p tamamlanmadÄ±ÄŸÄ±nÄ± Ã¶ÄŸrenmek iÃ§in block iÃ§erisinde mesajÄ±n olup olmadÄ±ÄŸÄ±na ya da completed eventi kontrol edilir. Bunun iÃ§in linkto iÃ§erisinde **PropagateCompletion** true olarak set edilmeli ve *broadcastBlock.Complete(); finalBlock.Completion.Wait();* metotlarÄ± Ã§aÄŸÄ±rÄ±lmalÄ±dÄ±r.
 ```csharp
 public static class LinktoWithPropagationExtension
 {
@@ -967,7 +960,7 @@ var broadcastBlock = new BroadcastBlock<int>(a => a);
 
 var a1 = new TransformBlock<int, int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
     return -a;
 });
@@ -975,7 +968,7 @@ var a1 = new TransformBlock<int, int>(a =>
 
 var a2 = new TransformBlock<int, int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
     Task.Delay(300).Wait();
     return a;
 });
@@ -990,7 +983,7 @@ broadcastBlock.LinkToWithPropagation(a2);
 
 var finalBlock = new ActionBlock<Tuple<int, int>>(a =>
     {
-        Console.WriteLine($"{a.Item1}: tüm consumer'lar tarafından işlenildi");
+        Console.WriteLine($"{a.Item1}: tÃ¼m consumer'lar tarafÄ±ndan iÅŸlenildi");
     });
 
 joinBlock.LinkToWithPropagation(finalBlock);
@@ -1005,20 +998,20 @@ finalBlock.Completion.Wait();
 
 ```
 ### Append
-Append bağlanan consumer ilişkisini önceliklendirmek ya da kaldırmak için kullanılır. Aşağıdaki bufferblock için görüleceği üzere sadece a1 mesajları gelmektedir.
+Append baÄŸlanan consumer iliÅŸkisini Ã¶nceliklendirmek ya da kaldÄ±rmak iÃ§in kullanÄ±lÄ±r. AÅŸaÄŸÄ±daki bufferblock iÃ§in gÃ¶rÃ¼leceÄŸi Ã¼zere sadece a1 mesajlarÄ± gelmektedir.
 
 ```csharp
 var bufferBlock = new BufferBlock<int>();
 
 var a1 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a1 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a1 tarafÄ±ndan iÅŸlenildi.");
 });
 
 
 var a2 = new ActionBlock<int>(a =>
 {
-    Console.WriteLine($"Mesaj {a} a2 tarafından işlenildi.");
+    Console.WriteLine($"Mesaj {a} a2 tarafÄ±ndan iÅŸlenildi.");
 });
 
 bufferBlock.LinkTo(a1);
@@ -1034,22 +1027,22 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-Mesaj 0 a1 tarafından işlenildi.
-Mesaj 1 a1 tarafından işlenildi.
-Mesaj 2 a1 tarafından işlenildi.
-Mesaj 3 a1 tarafından işlenildi.
-Mesaj 4 a1 tarafından işlenildi.
-Mesaj 5 a1 tarafından işlenildi.
-Mesaj 6 a1 tarafından işlenildi.
-Mesaj 7 a1 tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenildi.
+TamamlandÄ±
+Mesaj 0 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
 
-Append false yapılırsa a1 den önce a2 ilişkisi bağlanacaktır. Bu şekilde sonuçların hepsi a2 tarafından çalıştırılacaktır.
+Append false yapÄ±lÄ±rsa a1 den Ã¶nce a2 iliÅŸkisi baÄŸlanacaktÄ±r. Bu ÅŸekilde sonuÃ§larÄ±n hepsi a2 tarafÄ±ndan Ã§alÄ±ÅŸtÄ±rÄ±lacaktÄ±r.
 
 ```csharp
 bufferBlock.LinkTo(a2,new DataflowLinkOptions() { Append = false });
@@ -1058,22 +1051,22 @@ bufferBlock.LinkTo(a2,new DataflowLinkOptions() { Append = false });
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 4 a2 tarafından işlenildi.
-Mesaj 5 a2 tarafından işlenildi.
-Mesaj 6 a2 tarafından işlenildi.
-Mesaj 7 a2 tarafından işlenildi.
-Mesaj 8 a2 tarafından işlenildi.
-Mesaj 9 a2 tarafından işlenildi.
+TamamlandÄ±
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 5 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a2 tarafÄ±ndan iÅŸlenildi.
 ```
 </details>
 
 ### MaxMessages
-Block tarafından alınacak mesajları sınırlamak için kullanılır. Aşağıdaki örnekte a2 için maksimum 5 mesaj alınır.
+Block tarafÄ±ndan alÄ±nacak mesajlarÄ± sÄ±nÄ±rlamak iÃ§in kullanÄ±lÄ±r. AÅŸaÄŸÄ±daki Ã¶rnekte a2 iÃ§in maksimum 5 mesaj alÄ±nÄ±r.
 
 ```csharp
 bufferBlock.LinkTo(a2, new DataflowLinkOptions()
@@ -1087,17 +1080,17 @@ bufferBlock.LinkTo(a2, new DataflowLinkOptions()
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-Mesaj 5 a1 tarafından işlenildi.
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 4 a2 tarafından işlenildi.
-Mesaj 6 a1 tarafından işlenildi.
-Mesaj 7 a1 tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenildi.
-Mesaj 9 a1 tarafından işlenildi.
+TamamlandÄ±
+Mesaj 5 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 7 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 9 a1 tarafÄ±ndan iÅŸlenildi.
 ```
 
 </details> 
@@ -1109,16 +1102,16 @@ bufferBlock.LinkTo(a1, a => a % 2 == 0);
 ```
 
 ```
-Tamamlandı
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 4 a2 tarafından işlenildi.
+TamamlandÄ±
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 4 a2 tarafÄ±ndan iÅŸlenildi.
 ```
-Sonuç ne yazıkki istediğimiz gibi olmadı. Bunun nedeni bir önceki kodda da anlaşılacağı üzere ilk 5 mesajı a2 işliyor. a1 tarafına 5 msajı geliyor ve filtreden geçemiyor ve geçemediği için beklemede kalıyor ve dolayısıyla a1 tamamlanamıyor.
+SonuÃ§ ne yazÄ±kki istediÄŸimiz gibi olmadÄ±. Bunun nedeni bir Ã¶nceki kodda da anlaÅŸÄ±lacaÄŸÄ± Ã¼zere ilk 5 mesajÄ± a2 iÅŸliyor. a1 tarafÄ±na 5 msajÄ± geliyor ve filtreden geÃ§emiyor ve geÃ§emediÄŸi iÃ§in beklemede kalÄ±yor ve dolayÄ±sÄ±yla a1 tamamlanamÄ±yor.
 
-Bunun için aşağıdaki gibi NullTarget DataFlowBlock eklenebilir. Bu bize reddidilmiş olan block'lar için tamamlanabilir bir block sağlamış olacaktır. Bu block'u da aşağıdaki gibi LinkTo ile bağlayalım
+Bunun iÃ§in aÅŸaÄŸÄ±daki gibi NullTarget DataFlowBlock eklenebilir. Bu bize reddidilmiÅŸ olan block'lar iÃ§in tamamlanabilir bir block saÄŸlamÄ±ÅŸ olacaktÄ±r. Bu block'u da aÅŸaÄŸÄ±daki gibi LinkTo ile baÄŸlayalÄ±m
 ```csharp
 bufferBlock.LinkTo(a1, a => a % 2 == 0);
 bufferBlock.LinkTo(a2, new DataflowLinkOptions()
@@ -1135,38 +1128,38 @@ for (int i = 0; i < 10; i++)
 ```
 
 ```
-Tamamlandı
-Mesaj 4 a1 tarafından işlenildi.
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 6 a1 tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenildi.
+TamamlandÄ±
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
 ```
-NullTarget yerine herhangi bir action block koyduğumuzda bu block reddedilen mesajları alacaktır.
+NullTarget yerine herhangi bir action block koyduÄŸumuzda bu block reddedilen mesajlarÄ± alacaktÄ±r.
 
 ```csharp
-bufferBlock.LinkTo(new ActionBlock<int>(a => Console.WriteLine($"{a} mesajı reddedildi.")));
+bufferBlock.LinkTo(new ActionBlock<int>(a => Console.WriteLine($"{a} mesajÄ± reddedildi.")));
 ```
 
 ```
-Tamamlandı
-Mesaj 4 a1 tarafından işlenildi.
-5 mesajı reddedildi.
-7 mesajı reddedildi.
-9 mesajı reddedildi.
-Mesaj 0 a2 tarafından işlenildi.
-Mesaj 1 a2 tarafından işlenildi.
-Mesaj 2 a2 tarafından işlenildi.
-Mesaj 3 a2 tarafından işlenildi.
-Mesaj 6 a1 tarafından işlenildi.
-Mesaj 8 a1 tarafından işlenildi.
+TamamlandÄ±
+Mesaj 4 a1 tarafÄ±ndan iÅŸlenildi.
+5 mesajÄ± reddedildi.
+7 mesajÄ± reddedildi.
+9 mesajÄ± reddedildi.
+Mesaj 0 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 1 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 2 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 3 a2 tarafÄ±ndan iÅŸlenildi.
+Mesaj 6 a1 tarafÄ±ndan iÅŸlenildi.
+Mesaj 8 a1 tarafÄ±ndan iÅŸlenildi.
 ```
 
 ### Multiple Producers
-Daha önceki örneklerde birden fazla consumer ve bir producer vardı.
-Aşağıdaki gibi LinkTo ile iki producer'ı aynı consumer'a aktarabiliriz.
+Daha Ã¶nceki Ã¶rneklerde birden fazla consumer ve bir producer vardÄ±.
+AÅŸaÄŸÄ±daki gibi LinkTo ile iki producer'Ä± aynÄ± consumer'a aktarabiliriz.
 ```csharp
 var producer1 = new TransformBlock<string,string>(a =>
 {
@@ -1186,8 +1179,8 @@ producer2.LinkTo(printBlock);
 
 for (int i = 0; i < 10; i++)
 {
-    producer1.Post($"Producer 1 mesajı: {i}");
-    producer2.Post($"Producer 2 mesajı: {i}");
+    producer1.Post($"Producer 1 mesajÄ±: {i}");
+    producer2.Post($"Producer 2 mesajÄ±: {i}");
 }
 ```
 
@@ -1195,32 +1188,32 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-Producer 1 mesajı: 0
-Producer 2 mesajı: 0
-Producer 1 mesajı: 1
-Producer 1 mesajı: 2
-Producer 2 mesajı: 1
-Producer 1 mesajı: 3
-Producer 1 mesajı: 4
-Producer 2 mesajı: 2
-Producer 1 mesajı: 5
-Producer 1 mesajı: 6
-Producer 2 mesajı: 3
-Producer 1 mesajı: 7
-Producer 1 mesajı: 8
-Producer 2 mesajı: 4
-Producer 1 mesajı: 9
-Producer 2 mesajı: 5
-Producer 2 mesajı: 6
-Producer 2 mesajı: 7
-Producer 2 mesajı: 8
-Producer 2 mesajı: 9
+TamamlandÄ±
+Producer 1 mesajÄ±: 0
+Producer 2 mesajÄ±: 0
+Producer 1 mesajÄ±: 1
+Producer 1 mesajÄ±: 2
+Producer 2 mesajÄ±: 1
+Producer 1 mesajÄ±: 3
+Producer 1 mesajÄ±: 4
+Producer 2 mesajÄ±: 2
+Producer 1 mesajÄ±: 5
+Producer 1 mesajÄ±: 6
+Producer 2 mesajÄ±: 3
+Producer 1 mesajÄ±: 7
+Producer 1 mesajÄ±: 8
+Producer 2 mesajÄ±: 4
+Producer 1 mesajÄ±: 9
+Producer 2 mesajÄ±: 5
+Producer 2 mesajÄ±: 6
+Producer 2 mesajÄ±: 7
+Producer 2 mesajÄ±: 8
+Producer 2 mesajÄ±: 9
 ```
 
 </details>
 
-Kod içerisine completion metotlarını ekleyelim. Burada completion için oluşturduğumuz extension metot ile PropagateCompletion değerini güncellediğimizi de unutmayalım.
+Kod iÃ§erisine completion metotlarÄ±nÄ± ekleyelim. Burada completion iÃ§in oluÅŸturduÄŸumuz extension metot ile PropagateCompletion deÄŸerini gÃ¼ncellediÄŸimizi de unutmayalÄ±m.
 
 ```csharp
 var printBlock = new ActionBlock<string>(n => Console.WriteLine(n));
@@ -1229,39 +1222,39 @@ producer2.LinkToWithPropagation(printBlock);
 
 for (int i = 0; i < 10; i++)
 {
-    producer1.Post($"Producer 1 mesajı: {i}");
-    producer2.Post($"Producer 2 mesajı: {i}");
+    producer1.Post($"Producer 1 mesajÄ±: {i}");
+    producer2.Post($"Producer 2 mesajÄ±: {i}");
 }
 producer1.Complete();
 producer2.Complete();
 printBlock.Completion.Wait();
 ```
-Sonuç ne yazıkki istediğimiz gibi olmadı. Bazı mesajlar eksik kaldı. Bunun nedeni producer1 in tamamlandı komutunu göndermesiyle consumer'ın da tamamlanması. Burada süreç tek yönlü olduğu için consumer producer2 ye tamamlanıp tamamlanmadığını sormadığından tamamlandı olarak kabul edip yoluna devam etmekte.
+SonuÃ§ ne yazÄ±kki istediÄŸimiz gibi olmadÄ±. BazÄ± mesajlar eksik kaldÄ±. Bunun nedeni producer1 in tamamlandÄ± komutunu gÃ¶ndermesiyle consumer'Ä±n da tamamlanmasÄ±. Burada sÃ¼reÃ§ tek yÃ¶nlÃ¼ olduÄŸu iÃ§in consumer producer2 ye tamamlanÄ±p tamamlanmadÄ±ÄŸÄ±nÄ± sormadÄ±ÄŸÄ±ndan tamamlandÄ± olarak kabul edip yoluna devam etmekte.
 
 <details>
 <summary>Result</summary> 
 
 ```
-Producer 1 mesajı: 0
-Producer 1 mesajı: 1
-Producer 2 mesajı: 0
-Producer 1 mesajı: 2
-Producer 2 mesajı: 1
-Producer 1 mesajı: 3
-Producer 1 mesajı: 4
-Producer 2 mesajı: 2
-Producer 1 mesajı: 5
-Producer 1 mesajı: 6
-Producer 2 mesajı: 3
-Producer 1 mesajı: 7
-Producer 1 mesajı: 8
-Producer 2 mesajı: 4
-Producer 1 mesajı: 9
-Tamamlandı
+Producer 1 mesajÄ±: 0
+Producer 1 mesajÄ±: 1
+Producer 2 mesajÄ±: 0
+Producer 1 mesajÄ±: 2
+Producer 2 mesajÄ±: 1
+Producer 1 mesajÄ±: 3
+Producer 1 mesajÄ±: 4
+Producer 2 mesajÄ±: 2
+Producer 1 mesajÄ±: 5
+Producer 1 mesajÄ±: 6
+Producer 2 mesajÄ±: 3
+Producer 1 mesajÄ±: 7
+Producer 1 mesajÄ±: 8
+Producer 2 mesajÄ±: 4
+Producer 1 mesajÄ±: 9
+TamamlandÄ±
 ```
 </details>
 
-TPL Dataflow'u bir push mimarisidir. Producer consumer'ı bilir ancak tersi mümkün değildir. Bu yüzden PropagateCompletion değeri default olarak false'dur. Buradaki senaryo için TPL tarafında hazır bir çözüm olmasa da Task.WhenAll ile her iki completion'ın bittiği anı bulabilir ve printBlock'un da complete eventi ile süreci tamamlamış oluruz. Burada LinkTo kısmı eski haline getirilmiş yani propagation'lar kaldırılmıştır. 
+TPL Dataflow'u bir push mimarisidir. Producer consumer'Ä± bilir ancak tersi mÃ¼mkÃ¼n deÄŸildir. Bu yÃ¼zden PropagateCompletion deÄŸeri default olarak false'dur. Buradaki senaryo iÃ§in TPL tarafÄ±nda hazÄ±r bir Ã§Ã¶zÃ¼m olmasa da Task.WhenAll ile her iki completion'Ä±n bittiÄŸi anÄ± bulabilir ve printBlock'un da complete eventi ile sÃ¼reci tamamlamÄ±ÅŸ oluruz. Burada LinkTo kÄ±smÄ± eski haline getirilmiÅŸ yani propagation'lar kaldÄ±rÄ±lmÄ±ÅŸtÄ±r. 
 
 ```csharp
 var printBlock = new ActionBlock<string>(n => Console.WriteLine(n));
@@ -1270,8 +1263,8 @@ producer2.LinkTo(printBlock);
 
 for (int i = 0; i < 10; i++)
 {
-    producer1.Post($"Producer 1 mesajı: {i}");
-    producer2.Post($"Producer 2 mesajı: {i}");
+    producer1.Post($"Producer 1 mesajÄ±: {i}");
+    producer2.Post($"Producer 2 mesajÄ±: {i}");
 }
 await Task.WhenAll(new[] { producer1.Completion, producer2.Completion }).ContinueWith(a=>printBlock.Complete());
 printBlock.Completion.Wait();
@@ -1281,27 +1274,27 @@ printBlock.Completion.Wait();
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-Producer 1 mesajı: 0
-Producer 2 mesajı: 0
-Producer 1 mesajı: 1
-Producer 1 mesajı: 2
-Producer 2 mesajı: 1
-Producer 1 mesajı: 3
-Producer 1 mesajı: 4
-Producer 2 mesajı: 2
-Producer 1 mesajı: 5
-Producer 1 mesajı: 6
-Producer 2 mesajı: 3
-Producer 1 mesajı: 7
-Producer 1 mesajı: 8
-Producer 2 mesajı: 4
-Producer 1 mesajı: 9
-Producer 2 mesajı: 5
-Producer 2 mesajı: 6
-Producer 2 mesajı: 7
-Producer 2 mesajı: 8
-Producer 2 mesajı: 9
+TamamlandÄ±
+Producer 1 mesajÄ±: 0
+Producer 2 mesajÄ±: 0
+Producer 1 mesajÄ±: 1
+Producer 1 mesajÄ±: 2
+Producer 2 mesajÄ±: 1
+Producer 1 mesajÄ±: 3
+Producer 1 mesajÄ±: 4
+Producer 2 mesajÄ±: 2
+Producer 1 mesajÄ±: 5
+Producer 1 mesajÄ±: 6
+Producer 2 mesajÄ±: 3
+Producer 1 mesajÄ±: 7
+Producer 1 mesajÄ±: 8
+Producer 2 mesajÄ±: 4
+Producer 1 mesajÄ±: 9
+Producer 2 mesajÄ±: 5
+Producer 2 mesajÄ±: 6
+Producer 2 mesajÄ±: 7
+Producer 2 mesajÄ±: 8
+Producer 2 mesajÄ±: 9
 ```
 
 </details>
@@ -1313,9 +1306,9 @@ var block = new ActionBlock<int>(n =>
     {
         if (n == 5)
         {
-            throw new Exception("Hata mesajı!");
+            throw new Exception("Hata mesajÄ±!");
         }
-        Console.WriteLine(n + " mesajı işlenildi");
+        Console.WriteLine(n + " mesajÄ± iÅŸlenildi");
     });
 for (int i = 0; i < 10; i++)
 {
@@ -1327,36 +1320,36 @@ for (int i = 0; i < 10; i++)
 <summary>Result</summary> 
 
 ```
-Tamamlandı
-0 mesajı işlenildi
-1 mesajı işlenildi
-2 mesajı işlenildi
-3 mesajı işlenildi
-4 mesajı işlenildi
+TamamlandÄ±
+0 mesajÄ± iÅŸlenildi
+1 mesajÄ± iÅŸlenildi
+2 mesajÄ± iÅŸlenildi
+3 mesajÄ± iÅŸlenildi
+4 mesajÄ± iÅŸlenildi
 ```
 </details>
 
-Burada block tüm mesajları içerisine alır ve hata olasıya kadar işleme devam eder. Ancak ActionBlock yerine TransformBlock'a çevirip receive etmek isteseydik hata alacaktık. Peki actionblock'ta gönderdiğimiz hata neredeydi. Bunun için completion'lar kullanılır. Bu şekilde fırlattığımız hata mesajı yazacaktır.
+Burada block tÃ¼m mesajlarÄ± iÃ§erisine alÄ±r ve hata olasÄ±ya kadar iÅŸleme devam eder. Ancak ActionBlock yerine TransformBlock'a Ã§evirip receive etmek isteseydik hata alacaktÄ±k. Peki actionblock'ta gÃ¶nderdiÄŸimiz hata neredeydi. Bunun iÃ§in completion'lar kullanÄ±lÄ±r. Bu ÅŸekilde fÄ±rlattÄ±ÄŸÄ±mÄ±z hata mesajÄ± yazacaktÄ±r.
 
 ```csharp
 var block = new TransformBlock<int,int>(n =>
     {
         if (n == 5)
         {
-            throw new Exception("Hata mesajı!");
+            throw new Exception("Hata mesajÄ±!");
         }
-        Console.WriteLine(n + " mesajı işlenildi");
+        Console.WriteLine(n + " mesajÄ± iÅŸlenildi");
         return n;
     });
 for (int i = 0; i < 10; i++)
 {
     if(block.Post(i))
     {
-        Console.WriteLine(i+" mesajı kabul edildi");
+        Console.WriteLine(i+" mesajÄ± kabul edildi");
     }
     else
     {
-        Console.WriteLine(i+" mesajı kabul reddedildi");
+        Console.WriteLine(i+" mesajÄ± kabul reddedildi");
     }
 }
 try
@@ -1373,22 +1366,22 @@ catch (AggregateException ae)
 <summary>Result</summary> 
 
 ```
-0 mesajı kabul edildi
-1 mesajı kabul edildi
-2 mesajı kabul edildi
-3 mesajı kabul edildi
-4 mesajı kabul edildi
-5 mesajı kabul edildi
-0 mesajı işlenildi
-6 mesajı kabul edildi
-7 mesajı kabul edildi
-8 mesajı kabul edildi
-9 mesajı kabul edildi
-1 mesajı işlenildi
-2 mesajı işlenildi
-3 mesajı işlenildi
-4 mesajı işlenildi
-System.Exception: Hata mesajı!
+0 mesajÄ± kabul edildi
+1 mesajÄ± kabul edildi
+2 mesajÄ± kabul edildi
+3 mesajÄ± kabul edildi
+4 mesajÄ± kabul edildi
+5 mesajÄ± kabul edildi
+0 mesajÄ± iÅŸlenildi
+6 mesajÄ± kabul edildi
+7 mesajÄ± kabul edildi
+8 mesajÄ± kabul edildi
+9 mesajÄ± kabul edildi
+1 mesajÄ± iÅŸlenildi
+2 mesajÄ± iÅŸlenildi
+3 mesajÄ± iÅŸlenildi
+4 mesajÄ± iÅŸlenildi
+System.Exception: Hata mesajÄ±!
    at DataDlow.Parallelization_Filtering_Customization.ErrorSample...
 ```
 
@@ -1400,7 +1393,7 @@ public async Task Run()
 {
     var increasingBlock = CreateFilteringBlock<int>();
     var printBlock = new ActionBlock<int>(
-        a => Console.WriteLine(a + " mesajı alındı."));
+        a => Console.WriteLine(a + " mesajÄ± alÄ±ndÄ±."));
     increasingBlock.LinkToWithPropagation(printBlock);
 
     await increasingBlock.SendAsync(1);
@@ -1442,129 +1435,10 @@ public static IPropagatorBlock<T, T> CreateFilteringBlock<T>() where T : ICompar
 }
 ```
 
-<details>
-<summary>Result</summary> 
+### Kaynak
+https://www.dotnetcurry.com/patterns-practices/1412/dataflow-pattern-csharp-dotnet
+https://www.blinkingcaret.com/2019/05/15/tpl-dataflow-in-net-core-in-depth-part-1/
+https://csharppedia.com/en/tutorial/3110/task-parallel-library--tpl--dataflow-constructs
 
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
-```csharp
-
-```
-
-<details>
-<summary>Result</summary> 
-
-```
-
-```
-
-</details>
-
+#### Ek kaynak
+https://michaelscodingspot.com/pipeline-pattern-implementations-csharp/
