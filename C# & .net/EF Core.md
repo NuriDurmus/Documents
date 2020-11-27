@@ -66,8 +66,6 @@ modelBuilder.Entity<ExternalUser>().ToTable("ExternalUsers");
 modelBuilder.Entity<TimeRestrictedUser>().ToTable("TimeRestrictedUsers");
 ```
 
-```
-
 **Kaynak:** 
 https://youtu.be/BIImyq8qaD4?list=WL 
 https://docs.microsoft.com/tr-tr/ef/core/what-is-new/ef-core-5.0/whatsnew
