@@ -1,5 +1,3 @@
-Kaynak: https://app.pluralsight.com/library/courses/a19b0dc8-63a5-40c9-a60e-6674bd27f6ce/table-of-contents
-
 Aþaðýdaki gibi iki datetime listemiz olsun. Burada listelerin birbiriyle ayný olup olmadýðý kontrol edilirse sonuç false olacaktýr.
 ```csharp
 DateTime[] bankHols1 =
@@ -273,3 +271,8 @@ static int _value;
 - **BlockingCollection:**Mevcut concurrent collection'larý sarmalar ve üzerine ek özellikler ekler. Add ve Take metotlarýyla ekleme ve çýkarma yapýlýr. 
 
 FineGrainedLocking
+
+
+#### Kaynak
+
+https://app.pluralsight.com/library/courses/a19b0dc8-63a5-40c9-a60e-6674bd27f6ce/table-of-contents

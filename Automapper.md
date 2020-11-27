@@ -44,7 +44,7 @@ protected void Application_Start()
         }
         private static void CreateMappings(IMapperConfigurationExpression configuration)
         {
-           //
+
            configuration.CreateMap<EntityName, ModelName>(MemberList.None);
            configuration.CreateMap<EntityName2, ModelName2>(MemberList.None).BeforeMap((source,dest)=>dest.Url=dest.BaseUrl+ source.Id).AfterMap((source,dest)=>dest.Name+=" (CusomValue)").ReverseMap();
         }
