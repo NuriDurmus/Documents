@@ -3,11 +3,8 @@
     "",
     "\\C# & .net",
     "\\Concurrency",
-    "\\Concurrency\\TPL DataFlow",
-    "\\Concurrency\\TPL DataFlow\\DataDlow",
-    "\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow",
-    "\\Concurrency\\TPL DataFlow\\DataDlow\\DataDlow\\Parallelization-Filtering-Customization"
+    "\\Concurrency\\Functional Programming"
   ],
-  "SelectedNode": "\\Concurrency\\Concurrency.md",
+  "SelectedNode": "\\Concurrency\\Functional Programming.md",
   "PreviewInSolutionExplorer": false
 }
