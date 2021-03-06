@@ -1,6 +1,6 @@
 ### async Void vs async Task
 
-Void metodu async olarak sadece eventhandler'larda kullanılmalıdır. Diğer türlü en büyük sorun bir hata ile karşılaşıldığı durumdur. Void metodu async olarak kullanıldığında SynchronizationContext aktif olur. Ancak buradaki hataya erişim mümkün değildir.
+Void metodu async olarak sadece eventhandler'larda kullanÄ±lmalÄ±dÄ±r. DiÄŸer tÃ¼rlÃ¼ en bÃ¼yÃ¼k sorun bir hata ile karÅŸÄ±laÅŸÄ±ldÄ±ÄŸÄ± durumdur. Void metodu async olarak kullanÄ±ldÄ±ÄŸÄ±nda SynchronizationContext aktif olur. Ancak buradaki hataya eriÅŸim mÃ¼mkÃ¼n deÄŸildir.
 ```csharp
 private async void ThrowExceptionAsync()
 {
@@ -19,10 +19,11 @@ public void AsyncVoidExceptions_CannotBeCaughtByCatch()
   }
 }
 ```
-Async void metodu farklı yorumlamaya sahiptir. Task ya da Task\<T\> dönen bir metotda kolaylıkla await, Task.WhenAny/All gibi metotlar kullanılabilir. Bu yüzden void türündeki metotların tamamlanıp tamamlanmadığı gibi Task'a ait özelliklerin hepsinden mahrum kalmış oluyoruz. Async void metodu SynchronizationContext üzerinde ne zaman başladığını ya da tamamlandığı bilgisini set eder. Ancak buna erişmek için kompleks çözümlere başvurmak gerekecektir.
+Async void metodu farklÄ± yorumlamaya sahiptir. Task ya da Task\<T\> dÃ¶nen bir metotda kolaylÄ±kla await, Task.WhenAny/All gibi metotlar kullanÄ±labilir. Bu yÃ¼zden void tÃ¼rÃ¼ndeki metotlarÄ±n tamamlanÄ±p tamamlanmadÄ±ÄŸÄ± gibi Task'a ait Ã¶zelliklerin hepsinden mahrum kalmÄ±ÅŸ oluyoruz. Async void metodu SynchronizationContext Ã¼zerinde ne zaman baÅŸladÄ±ÄŸÄ±nÄ± ya da tamamlandÄ±ÄŸÄ± bilgisini set eder. Ancak buna eriÅŸmek iÃ§in kompleks Ã§Ã¶zÃ¼mlere baÅŸvurmak gerekecektir.
 
 Kaynak:
 
 https://docs.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming
 
-
+ParallelLoopState
+https://docs.microsoft.com/tr-tr/dotnet/api/system.threading.tasks.parallelloopstate.shouldexitcurrentiteration?view=net-5.0
